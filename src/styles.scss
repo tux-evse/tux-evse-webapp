@@ -1,0 +1,41 @@
+/* You can add global styles to this file, and also import other style files */
+:root {
+    --green-color: #82e500;
+    --bluetooth-color: #2344e8;
+    --bluelight-color: #9dc3e6;
+    --red-color: #ff4500;
+    --off-color: lightgray;
+}
+
+.on {
+    color: var(--green-color);
+}
+
+.off {
+    color: var(--red-color);
+}
+
+.picto {
+    text-align: end;
+}
+
+.picto svg {
+    height: 60px;
+}
+
+.picto-header {
+    text-align: center;
+    height: 50px;
+}
+
+.logo {
+    height: 40px;
+}
+
+.picto .bi-wifi {
+    fill: var(--green-color);
+}
+
+.picto .bi-reception-4 {
+    fill: var(--bluelight-color);
+}

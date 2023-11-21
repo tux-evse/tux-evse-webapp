@@ -1,0 +1,23 @@
+.blink{
+    animation: blink 5s infinite;
+}
+@keyframes blink{
+    0% {
+        fill: currentColor;
+    }
+    20% {
+        fill: var(--green-color);
+    }
+    40% {
+        fill: currentColor;
+    }
+    60% {
+        fill: var(--green-color)
+    }
+    80% {
+        fill: currentColor;
+    }
+    100% {
+        fill: var(--green-color);
+    }
+}

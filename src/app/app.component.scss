@@ -1,0 +1,44 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+* {
+    font-family: Roboto, Helvetica, sans-serif;
+  }
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.global {
+    border: 3px solid;
+    border-radius: 25px;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -10px; /* Adjust for column padding */
+}
+
+.col {
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+/* Responsive columns */
+.col-1 { width: 20%; }
+.col-3 { width: 33.33%; }
+.col-5 { width: 50%; }
+
+/* Adjustments for smaller screens */
+@media screen and (max-width: 600px) {
+    .col-1, .col-3 {
+        width: 100%;
+    }
+}
