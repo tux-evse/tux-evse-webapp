@@ -1,0 +1,16 @@
+rp-manifest: 1
+
+id: tux-evse-webapp-mock
+version: 1.0
+name: tux-evse-webapp-mock
+description: Mock for Tux-EVSE WebApp
+author: IoT.bzh team <team@iot.bzh>
+license: GPL
+targets:
+  - target: main
+    content:
+      src: bin/tux-evse-mock-api.py
+      type: application/x-executable
+    provided-api:
+      - name: tux-evse-mock
+        value: ws

@@ -1,0 +1,11 @@
+{
+    "cSpell.words": [
+        "evse",
+        "htdocs"
+    ],
+    // Configure glob patterns for excluding files and folders.
+    "files.exclude": {
+        ".git": true,
+        "*.tar.gz": true,
+    }
+}

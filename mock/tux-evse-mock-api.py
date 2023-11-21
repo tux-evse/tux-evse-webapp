@@ -124,6 +124,12 @@ demoApi = {
     'verbs'   : demoVerbs,
 }
 
+# in normal execution, connecting using socket opened using systemd socket activation method
+# in native mode do nothing
+if os.environ.get('NATIVE') is None:
+    demoApi['uri'] = 'sd:tux-evse-mock'
+
+
 # Determine roothttp directory
 httpDir = os.environ.get('TUX_EVSE_WEBUI_DIR')
 if httpDir == None or not os.path.exists(httpDir):
