@@ -8,11 +8,12 @@ import { DateComponent } from './date/date.component';
 import { TimeComponent } from './time/time.component';
 import { StatusPlugComponent } from './status-plug/status-plug.component';
 import { StatusBatteryComponent } from './status-battery/status-battery.component';
-import { ChargeInformationsComponent } from './charge-informations/charge-informations.component';
 import { ZoneMessageComponent } from './zone-message/zone-message.component';
 import { SmartChargingComponent } from './smart-charging/smart-charging.component';
 import { DetailsComponent } from './details/details.component';
 import { AFBWebSocketService } from './@core/services/AFB-websocket.service';
+import { TuxEVSEService } from './@core/services/tux-evse.service';
+import { ChargeInformationComponent } from './charge-information/charge-information.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,7 @@ import { AFBWebSocketService } from './@core/services/AFB-websocket.service';
     TimeComponent,
     StatusPlugComponent,
     StatusBatteryComponent,
-    ChargeInformationsComponent,
+    ChargeInformationComponent,
     ZoneMessageComponent,
     SmartChargingComponent,
     DetailsComponent
@@ -31,7 +32,10 @@ import { AFBWebSocketService } from './@core/services/AFB-websocket.service';
     BrowserModule,
     AppRoutingModule
   ],
-  providers: [AFBWebSocketService],
+  providers: [
+    AFBWebSocketService,
+    TuxEVSEService,
+],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

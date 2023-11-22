@@ -12,5 +12,5 @@ targets:
       src: bin/tux-evse-mock-api.py
       type: application/x-executable
     provided-api:
-      - name: tux-evse-mock
+      - name: tux-evse-webapp-mock
         value: ws

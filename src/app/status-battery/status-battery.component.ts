@@ -1,10 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AFBWebSocketService } from '../@core/services/AFB-websocket.service';
-
-
-export interface IBatteryInfo {
-    chargeValue: Number;
-}
+import { IBatteryInfo, TuxEVSEService } from '../@core/services/tux-evse.service';
 
 
 @Component({
@@ -15,19 +11,17 @@ export interface IBatteryInfo {
 
 export class StatusBatteryComponent implements OnInit {
 
-    battery: IBatteryInfo = { chargeValue: 0 };
+    battery: IBatteryInfo;
 
     constructor(
-        private afbService: AFBWebSocketService,
+        private tuxEvseService: TuxEVSEService,
     ) {
     }
 
     ngOnInit() {
-        this.afbService.OnEvent('*').subscribe(data => {
-            // console.log('SEB BAT EVENTinfo=', data);
-            if (data.event === 'tux-evse-mock/py-tux-evse-mock') {
-                this.battery = data.data?.batteryInfo
-            }
-        });
+        // Retrieve data from service
+        this.tuxEvseService.getBatteryInfo$().subscribe(data => {
+            this.battery = data;
+        })
     }
 }

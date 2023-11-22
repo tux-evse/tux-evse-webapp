@@ -17,12 +17,14 @@ export class AppComponent implements OnInit {
     private afbService: AFBWebSocketService,
   ) {
     afbService.Init('api', 'HELLO');
-    afbService.SetURL('localhost', '1234');
+    // if (environment.production) {
+        this.afbService.SetURL(window.location.host);
+    // } else {
+    //     afbService.SetURL('localhost', '1234');
+    // }
   }
 
   ngOnInit() {
-    // (wsStatus$ | async)?.connected ?'on':'off' 
-    // this.wsStatus$ = this.afbService.Status$;
     this.afbService.Status$.subscribe(status => {
       if (status.connected) {
         this.wifiStatus = 'on';

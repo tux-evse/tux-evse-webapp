@@ -1,7 +1,10 @@
 {
     "cSpell.words": [
         "evse",
-        "htdocs"
+        "htdocs",
+        "redpesk",
+        "valeo",
+        "WEBUI"
     ],
     // Configure glob patterns for excluding files and folders.
     "files.exclude": {

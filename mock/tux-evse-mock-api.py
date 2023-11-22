@@ -14,15 +14,18 @@ count=0
 durationSec=0
 tic=0
 evtid=None
+energy=44.1
 batCharge=77.0
 
 
 def getChargerInfo():
     global durationSec
+    global energy
     temp = random.randint(0, 90)
     durationSec += 1
+    energy += 0.5
     duration = '01:02:%02d' % (durationSec%60)
-    return  {"energy": 123, "duration": duration, "temp": temp}
+    return  {"energy": energy, "duration": duration, "temp": temp}
 
 def getBatteryInfo():
     global batCharge
@@ -36,11 +39,16 @@ def timerCB (timer, count, userdata):
     tic += 1
     chInfo = getChargerInfo()
     batInfo = getBatteryInfo()
-    # libafb.notice (timer, "timer':%s' tic=%d, userdata=%s",libafb.config(timer, 'uid'), tic, userdata)
     libafb.notice (timer, "timer':%s' tic=%d, chargerInfo={%d, %s, %d}, batteryInfo=%s",
-                   libafb.config(timer, 'uid'), tic, chInfo['energy'], chInfo['duration'], chInfo['temp'], batInfo['chargeValue'])
+                   libafb.config(timer, 'uid'),
+                   tic,
+                   chInfo['energy'],
+                   chInfo['duration'],
+                   chInfo['temp'],
+                   batInfo['chargeValue'])
     libafb.evtpush(evtid, {'chargerInfo':chInfo, 'batteryInfo': batInfo})
     #return -1 # should exit timer
+    return
 
 ## ping/pong test func
 def pingCB(rqt, *args):
@@ -62,9 +70,9 @@ def unsubscribeCB(rqt, *args):
 def chargerInfoCB(rqt, *args):
     return  (0, getChargerInfo())
 
-def argsCB(rqt, *args):
-    libafb.notice  (rqt, "actionCB query=%s", args)
-    libafb.reply (rqt, 0, {'query': args})
+# def argsCB(rqt, *args):
+#     libafb.notice  (rqt, "actionCB query=%s", args)
+#     libafb.reply (rqt, 0, {'query': args})
 
 ## executed when binder is ready to serv
 def loopBinderCb(binder, nohandle):
@@ -108,13 +116,13 @@ demoVerbs = [
 
     {'uid':'py-charger-info', 'verb':'charger-info', 'callback':chargerInfoCB, 'info':'charger Info'},
 
-    {'uid':'py-args', 'verb':'args', 'callback':argsCB, 'info':'py check input query', 'sample':[{'arg1':'arg-one', 'arg2':'arg-two'}, {'argA':1, 'argB':2}]},
+    # {'uid':'py-args', 'verb':'args', 'callback':argsCB, 'info':'py check input query', 'sample':[{'arg1':'arg-one', 'arg2':'arg-two'}, {'argA':1, 'argB':2}]},
 ]
 
 ## define and instantiate API
 demoApi = {
     'uid'     : 'py-tux-evse-mock',
-    'api'     : 'tux-evse-mock',
+    'api'     : 'tux-evse-webapp-mock',
     'class'   : 'test',
     'info'    : 'Tux EVSE mock',
     'control' : apiControlCb,
@@ -124,10 +132,11 @@ demoApi = {
     'verbs'   : demoVerbs,
 }
 
-# in normal execution, connecting using socket opened using systemd socket activation method
-# in native mode do nothing
-if os.environ.get('NATIVE') is None:
-    demoApi['uri'] = 'sd:tux-evse-mock'
+# On target, export api
+if os.environ.get('TUX_EVSE_NATIVE') is None:
+    demoApi['uri'] = 'sd:tux-evse-webapp-mock'
+#   demoApi['uri'] ='sd:tux-evse-mock?as-api=tux-evse-webapp-mock'
+
 
 
 # Determine roothttp directory
@@ -140,24 +149,31 @@ if httpDir == None or not os.path.exists(httpDir):
     curDir = os.path.join(os.getcwd(), 'dist', 'valeo')
     if os.path.exists(parentCurDir):
         httpDir = parentCurDir
+if httpDir == None or not os.path.exists(httpDir):
+    if os.path.exists('/usr/redpesk/tux-evse-webapp/htdocs'):
+        httpDir = '/usr/redpesk/tux-evse-webapp/htdocs'
 if httpDir == None:
     httpDir = '.'
 
-
+port = int(os.environ.get('TUX_EVSE_MOCK_PORT', 1234))
 
 # define and instantiate libafb-binder
 demoOpts = {
     'uid'     : 'py-binder',
-    'port'    : 1234,
+    'port'    : port,
     'verbose' : 9,
     'rootdir' : '.',
     'roothttp' : httpDir,
-    'alias'   : ['/devtools:/usr/share/afb-ui-devtools/binder'],
 }
+
+# create alias on devtools (accessible localhost:xxxx/devtools) only when installed
+devToolPath = '/usr/share/afb-ui-devtools/binder'
+if os.path.exists(httpDir):
+    demoOpts['alias'] = ['/devtools:' + devToolPath]
 
 # instantiate binder and API
 binder= libafb.binder(demoOpts)
-myapi = libafb.apiadd(demoApi)
+myapi = libafb.apicreate(demoApi)
 
 libafb.notice(binder, "roothttp=%s", httpDir)
 

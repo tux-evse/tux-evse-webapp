@@ -31,8 +31,12 @@ Or you can also rebuild build from sources
 
 Make sure that your dependencies are reachable from the Python scripting engine, before starting your test.
 
+Start natively on your host :
+
 ```bash
-    python3 ./tux-evse-mock-api.py
+    export TUX_EVSE_NATIVE=1
+    export TUX_EVSE_MOCK_PORT=1234
+    ./mock/tux-evse-mock-api.py
 
     # in another terminal
     curl -s localhost:1234/api/tux-evse-mock/ping |jq
