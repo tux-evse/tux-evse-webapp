@@ -17,7 +17,7 @@ targets:
 file-properties:
   - name: htdocs/favicon.ico
     value: public
-  - name: htdocs/index.hml
+  - name: htdocs/index.html
     value: public
   - name: htdocs/main.js
     value: public
