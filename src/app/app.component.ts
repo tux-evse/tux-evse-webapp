@@ -7,12 +7,17 @@ import { AFBWebSocketService, SocketStatus } from './@core/services/AFB-websocke
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'valeo';
-  wsStatus$: Observable<SocketStatus>;
+  // wsStatus$: Observable<SocketStatus>;
 
-  wifiStatus: string = 'off';
+  // wifiStatus: string = 'off';
 
+  /**
+   * Initializes the constructor of the class.
+   *
+   * @param {AFBWebSocketService} afbService - The AFBWebSocketService instance.
+   */
   constructor(
     private afbService: AFBWebSocketService,
   ) {
@@ -24,20 +29,28 @@ export class AppComponent implements OnInit {
     // }
   }
 
-  ngOnInit() {
-    this.afbService.Status$.subscribe(status => {
-      if (status.connected) {
-        this.wifiStatus = 'on';
-      } else {
-        this.wifiStatus = 'off';
-      }
-      console.log('AFB connection status:', status);
-    })
-    this.afbService.Connect();
-  }
+  /**
+   * Initializes the component.
+   *
+   * Subscribes to the Status$ Observable of the afbService to listen for changes in the connection status.
+   * If the status is connected, sets the wifiStatus property to 'on', otherwise sets it to 'off'.
+   * Logs the AFB connection status to the console.
+   * Connects to the afbService.
+   */
+  // ngOnInit() {
+  //   this.afbService.Status$.subscribe(status => {
+  //     if (status.connected) {
+  //       this.wifiStatus = 'on';
+  //     } else {
+  //       this.wifiStatus = 'off';
+  //     }
+  //     console.log('AFB connection status:', status);
+  //   })
+  //   this.afbService.Connect();
+  // }
 
-  restartConnection() {
-    this.afbService.Disconnect();
-    this.afbService.Connect();
-  }
+  // restartConnection() {
+  //   this.afbService.Disconnect();
+  //   this.afbService.Connect();
+  // }
 }

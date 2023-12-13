@@ -13,11 +13,21 @@ export class StatusBatteryComponent implements OnInit {
 
     battery: IBatteryInfo;
 
+    /**
+     * Constructs a new instance of the class.
+     *
+     * @param {TuxEVSEService} tuxEvseService - The TuxEVSEService instance.
+     */
     constructor(
         private tuxEvseService: TuxEVSEService,
     ) {
     }
 
+    /**
+     * Initializes the component and retrieves battery information from the service.
+     *
+     * @return {void}
+     */
     ngOnInit() {
         // Retrieve data from service
         this.tuxEvseService.getBatteryInfo$().subscribe(data => {

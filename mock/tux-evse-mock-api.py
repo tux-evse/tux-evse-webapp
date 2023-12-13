@@ -5,20 +5,130 @@
 
 # import libafb python glue
 # FIXME from afbpyglue import libafb
+from enum import Enum
+import time
 import _afbpyglue as libafb
 import random
 import os
+
+class PlugState(Enum):
+    DISCONNECTED = "disconnected"
+    CONNECTED_UNLOCKED = "connected and unlocked"
+    CONNECTED_LOCKED = "connected and locked"
+    ERROR = "error"
 
 ## static variables
 count=0
 durationSec=0
 tic=0
 evtid=None
+btnStart=False
 energy=44.1
 batCharge=77.0
+plugState=PlugState.DISCONNECTED
+motorLockStatus=False
+chargeDurationSec=0
+instantEnergy=0.0
+totalEnergy=0.0
+informationArea=""
+# network status
+wifiStatus=False
+mobileStatus=False
+ethernetStatus=False
+nfcStatus=False
+# smart charging
+iso15118Status=False
+pncStatus=False
+v2gStatus=False
 
+# stopwatch function and display the timer in the UI format in hours:minutes:seconds
+def stopwatch():
+    """
+    A stopwatch function that measures the elapsed time and displays it in the format "hours:minutes:seconds".
+
+    Parameters:
+        None
+
+    Returns:
+        elapsed_time (str): The elapsed time in the format "hours:minutes:seconds".
+    """
+    start_time = time.time()
+
+    # Perform some task or wait for a certain period of time
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+
+    # Convert elapsed_time to hours, minutes, and seconds
+    hours = int(elapsed_time // 3600)
+    minutes = int((elapsed_time % 3600) // 60)
+    seconds = int(elapsed_time % 60)
+
+    # Format the elapsed time as "hours:minutes:seconds"
+    elapsed_time_formatted = f"{hours:02}:{minutes:02}:{seconds:02}"
+
+    return elapsed_time_formatted
+
+def getNetworkStatus():
+    """
+    Toggles the status of the network connections and returns their updated status.
+
+    Parameters:
+    None
+
+    Returns:
+    Tuple: A tuple containing the updated status of the wifi, mobile, ethernet, and nfc connections.
+        - wifiStatus (bool): The updated status of the wifi connection.
+        - mobileStatus (bool): The updated status of the mobile connection.
+        - ethernetStatus (bool): The updated status of the ethernet connection.
+        - nfcStatus (bool): The updated status of the nfc connection.
+    """
+    global wifiStatus
+    global mobileStatus
+    global ethernetStatus
+    global nfcStatus
+    wifiStatus = not wifiStatus
+    mobileStatus = not mobileStatus
+    ethernetStatus = not ethernetStatus
+    nfcStatus = not nfcStatus
+    return wifiStatus, mobileStatus, ethernetStatus, nfcStatus
+
+def getVehicleStatus():
+    """
+    Retrieve the current status of the vehicle.
+
+    This function returns the value of the global variable `PlugState`, which represents
+    the state of the vehicle's plug.
+
+    Parameters:
+        None
+
+    Returns:
+        The current status of the vehicle's plug (PlugState).
+
+    """
+    global plugState
+    return plugState
+
+def authenticate():
+    global nfcStatus
+    if nfcStatus:
+        return True
+    else:
+        return False
 
 def getChargerInfo():
+    """
+    Generate the information about the charger.
+
+    Parameters:
+        None
+
+    Returns:
+        dict: A dictionary containing the following information:
+            - energy (float): The amount of energy.
+            - duration (str): The duration in the format '01:02:%02d'.
+            # - temp (int): The temperature in degrees Celsius.
+    """
     global durationSec
     global energy
     temp = random.randint(0, 90)
@@ -35,6 +145,17 @@ def getBatteryInfo():
 
 # timer handle callback
 def timerCB (timer, count, userdata):
+    """
+    Callback function for the timer.
+
+    Args:
+        timer: The timer object.
+        count: The number of times the timer has been called.
+        userdata: Any user-defined data associated with the timer.
+
+    Returns:
+        None
+    """
     global tic
     tic += 1
     chInfo = getChargerInfo()

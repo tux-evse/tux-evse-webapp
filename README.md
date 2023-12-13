@@ -19,15 +19,10 @@ vi /etc/apt/sources.list.d/redpesk-sdk.list
 deb [trusted=yes] https://silo.redpesk.iot/redpesk/private/sdk/obs/next/sdk/xUbuntu_22.04/latest/ ./
 ```
 
-sudo apt install libafb-python
-
-Or you can also rebuild build from sources
+Install dependencies packages
 
 ```bash
-    mkdir build
-    cd build
-    cmake ..
-    make
+sudo apt install libafb-python
 ```
 
 ### On target (production)
@@ -37,29 +32,53 @@ Login on target and declare repo where you build this app binding
 ```bash
 dnf install tux-evse-webapp-mock
 afm-util list
-afm-util start tux-evse-webapp-mock
-#afm-util kill tux-evse-webapp-mock
+
 
 # [optional] add afb-ui-devtools - useful for analysis
 dnf install afb-ui-devtools
 ```
 
+## Webapp build
+
+```bash
+npm install
+npm run build
+```
+To build webapp in production mode use:
+```bash
+./package-webapp.sh
+```
+
 ## Testing
+
+### Native
 
 Make sure that your dependencies are reachable from the Python scripting engine, before starting your test.
 
 Start natively on your host :
 
 ```bash
+    npm run watch
+    # in a new terminal
     export TUX_EVSE_NATIVE=1
     export TUX_EVSE_MOCK_PORT=1234
     ./mock/tux-evse-mock-api.py
 
     # in another terminal
-    curl -s localhost:1234/api/tux-evse-mock/ping |jq
+    curl -s localhost:1234/api/tux-evse-webapp-mock/ping |jq
 
     # start dev-tool
     xdg-open localhost:1234/devtools
+```
+
+### Target
+
+```bash
+#disable firewalld to allow external access
+systemctl stop firewalld
+afm-util start tux-evse-webapp-mock
+#afm-util kill tux-evse-webapp-mock
+journalctl -feu tux-evse-webapp-mock
 ```
 
 ## Debug from codium

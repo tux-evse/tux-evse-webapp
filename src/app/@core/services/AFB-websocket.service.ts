@@ -92,6 +92,12 @@ export class AFBWebSocketService {
     }
 
 
+    /**
+     * Initializes the class with a base URL and an optional initial token.
+     *
+     * @param {string} base - The base URL for the class.
+     * @param {string} [initialToken] - An optional initial token.
+     */
     Init(base: string, initialToken?: string) {
         this.afb = new AFB({
             base: base,
@@ -104,12 +110,23 @@ export class AFBWebSocketService {
         this.InitDone$ = this._isInitDone.asObservable();
     }
 
+    /**
+     * Sets the URL and port for the connection.
+     *
+     * @param {string} location - The location of the connection.
+     * @param {string} [port] - The port of the connection. If not provided, it will use an empty string.
+     */
     SetURL(location: string, port?: string) {
         this.conn_location = location;
         this.conn_port = port || '';
         this.afb.setURL(location, port);
     }
 
+    /**
+     * Returns the URL based on the connection location and port.
+     *
+     * @return {string} The URL.
+     */
     GetUrl(): string {
         if (this.conn_port !== '' && this.conn_port !== undefined) {
             return this.conn_location + ':' + this.conn_port;
@@ -117,6 +134,11 @@ export class AFBWebSocketService {
         return this.conn_location;
     }
 
+    /**
+     * Establishes a websocket connection.
+     *
+     * @return {Error | null} An error if the connection cannot be established, otherwise null.
+     */
     Connect(): (Error | null) {
 
         // Establish websocket connection
@@ -134,6 +156,11 @@ export class AFBWebSocketService {
             }
         );
 
+        /**
+         * Sets the callback function to be executed when the WebSocket connection is closed.
+         *
+         * @param {CloseEvent} event - The event object representing the WebSocket connection close event.
+         */
         this.ws.onclose = (event: CloseEvent) => {
             this._isInitDone.next(false);
             this._NotifyServerState(false);
@@ -144,6 +171,12 @@ export class AFBWebSocketService {
     }
 
 
+    /**
+     * Disconnects from the server.
+     *
+     * @param {type} paramName - description of parameter
+     * @return {type} description of return value
+     */
     Disconnect() {
         // TODO : close all subjects
         this._NotifyServerState(false);
@@ -175,6 +208,7 @@ export class AFBWebSocketService {
     //         })
     //     );
     // }
+
     Send(method: string, params: object | string): Observable<any> {
         const param = this.CheckQuery(params);
         return this._isInitDone.pipe(
@@ -194,6 +228,12 @@ export class AFBWebSocketService {
         );
     }
 
+    /**
+     * Check if the given string is a valid JSON.
+     *
+     * @param {string} str - The string to be checked.
+     * @return {boolean} Returns true if the string is a valid JSON, otherwise returns false.
+     */
     CheckIfJson(str: string): boolean {
         if (str === undefined || str === '' || !str.trim().length) {
             return true;
@@ -206,12 +246,24 @@ export class AFBWebSocketService {
         return true;
     }
 
+    /**
+     * Check the query parameters and parse them if necessary.
+     *
+     * @param {object | string} params - The query parameters to check and parse.
+     * @return {object} - The parsed query parameters.
+     */
     CheckQuery(params: object | string) {
         if (!params || params === undefined || (typeof params === 'string' && this.CheckIfJson(params) === false))
             params = '{}';
         return typeof params === 'string' ? JSON.parse(params) : params;
     }
 
+    /**
+     * Syntax highlights JSON data.
+     *
+     * @param {any} json - The JSON data to be syntax highlighted.
+     * @return {string} The syntax highlighted JSON data.
+     */
     syntaxHighlight(json: any) {
         if (typeof json !== 'string') {
             json = JSON.stringify(json, undefined, 2);
@@ -250,6 +302,12 @@ export class AFBWebSocketService {
     }
 
 
+    /**
+     * Notifies the server state.
+     *
+     * @param {boolean} connected - The connection state.
+     * @param {number} [attempt] - The number of connection attempts.
+     */
     private _NotifyServerState(connected: boolean, attempt?: number) {
         this._status.connected = connected;
         if (connected) {
@@ -279,6 +337,11 @@ export class AFBWebSocketService {
     //     );
     // }
 
+    /**
+     * Retrieves the list of APIs by sending a request to the server.
+     *
+     * @return {Observable<Array<string>>} An observable that emits an array of strings representing the APIs.
+     */
     getApis(): Observable<Array<string>> {
         return this.Send('monitor/get', { 'apis': false }).pipe(
             map(data => {
@@ -295,6 +358,11 @@ export class AFBWebSocketService {
         );
     }
 
+    /**
+     * Retrieves the AFBApis by sending a GET request to the 'monitor/get' endpoint.
+     *
+     * @return {Observable<AFBApis>} An observable that emits the retrieved AFBApis.
+     */
     Discover(): Observable<AFBApis> {
         return this.Send('monitor/get', { 'apis': true }).pipe(
             map(data => {
@@ -303,6 +371,12 @@ export class AFBWebSocketService {
         );
     }
 
+    /**
+     * Generates the function comment for the private _GetAFBApis function.
+     *
+     * @param {any} data - The input data for the function.
+     * @return {AFBApis} The array of AFBApis generated by the function.
+     */
     private _GetAFBApis(data: any) {
         const Apis: AFBApis = [];
         const keys = Object.keys(data.apis);
@@ -323,6 +397,12 @@ export class AFBWebSocketService {
         return Apis;
     }
 
+    /**
+     * Retrieves the AFB verbs from the given value.
+     *
+     * @param {any} value - The value to retrieve the AFB verbs from.
+     * @return {Array<AFBVerb>} An array of AFBVerb objects representing the AFB verbs.
+     */
     private _GetAFBVerbs(value: any) {
         const AFBVerbs: Array<AFBVerb> = [];
         const verbs = Object.keys(value.value.paths);

@@ -53,7 +53,7 @@ export class TuxEVSEService {
                         if (data.data.batteryInfo) {
                             this.batInfo = data.data.batteryInfo;
                             this.batInfoSub.next(this.batInfo);
-                            }
+                        }
                     }
                 }
             });

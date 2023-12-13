@@ -14,6 +14,10 @@ import { DetailsComponent } from './details/details.component';
 import { AFBWebSocketService } from './@core/services/AFB-websocket.service';
 import { TuxEVSEService } from './@core/services/tux-evse.service';
 import { ChargeInformationComponent } from './charge-information/charge-information.component';
+import { HeaderComponent } from './header/header.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { StartStopComponent } from './start-stop/start-stop.component';
+import { BorneInformationComponent } from './borne-information/borne-information.component';
 
 @NgModule({
   declarations: [
@@ -26,11 +30,15 @@ import { ChargeInformationComponent } from './charge-information/charge-informat
     ChargeInformationComponent,
     ZoneMessageComponent,
     SmartChargingComponent,
-    DetailsComponent
+    DetailsComponent,
+    HeaderComponent,
+    StartStopComponent,
+    BorneInformationComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    NgbModule
   ],
   providers: [
     AFBWebSocketService,
