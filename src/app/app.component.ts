@@ -25,7 +25,7 @@ export class AppComponent {
     // if (environment.production) {
         this.afbService.SetURL(window.location.host);
     // } else {
-    //     afbService.SetURL('localhost', '1234');
+    //     afbService.SetURL('localhost', '1235');
     // }
   }
 

@@ -61,14 +61,14 @@ Start natively on your host :
     npm run watch
     # in a new terminal
     export TUX_EVSE_NATIVE=1
-    export TUX_EVSE_MOCK_PORT=1234
+    export TUX_EVSE_MOCK_PORT=1235
     ./mock/tux-evse-mock-api.py
 
     # in another terminal
-    curl -s localhost:1234/api/tux-evse-webapp-mock/ping |jq
+    curl -s localhost:1235/api/tux-evse-webapp-mock/ping |jq
 
     # start dev-tool
-    xdg-open localhost:1234/devtools
+    xdg-open localhost:1235/devtools
 ```
 
 ### Target

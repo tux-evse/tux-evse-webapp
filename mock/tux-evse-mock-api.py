@@ -262,29 +262,31 @@ if os.environ.get('TUX_EVSE_NATIVE') is None:
 
 # Determine roothttp directory
 httpDir = os.environ.get('TUX_EVSE_WEBUI_DIR')
-if httpDir == None or not os.path.exists(httpDir):
+if httpDir is None or not os.path.exists(httpDir):
     parentCurDir = os.path.join(os.path.dirname(__file__), '..', 'dist', 'valeo')
     if os.path.exists(parentCurDir):
         httpDir = parentCurDir
-if httpDir == None or not os.path.exists(httpDir):
+if httpDir is None or not os.path.exists(httpDir):
     curDir = os.path.join(os.getcwd(), 'dist', 'valeo')
     if os.path.exists(parentCurDir):
         httpDir = parentCurDir
-if httpDir == None or not os.path.exists(httpDir):
+if httpDir is None or not os.path.exists(httpDir):
     if os.path.exists('/usr/redpesk/tux-evse-webapp/htdocs'):
         httpDir = '/usr/redpesk/tux-evse-webapp/htdocs'
-if httpDir == None:
+if httpDir is None:
     httpDir = '.'
 
-port = int(os.environ.get('TUX_EVSE_MOCK_PORT', 1234))
+# allow to force the port number only in native mode
+# Note: set to 0 to let framework use/determine default port
+port = int(os.environ.get('TUX_EVSE_MOCK_PORT', 1235))
 
 # define and instantiate libafb-binder
 demoOpts = {
     'uid'     : 'py-binder',
-    'port'    : port,
-    'verbose' : 9,
+    'verbose' : 1023,
     'rootdir' : '.',
     'roothttp' : httpDir,
+    'port': port,
 }
 
 # create alias on devtools (accessible localhost:xxxx/devtools) only when installed
@@ -297,6 +299,7 @@ binder= libafb.binder(demoOpts)
 myapi = libafb.apicreate(demoApi)
 
 libafb.notice(binder, "roothttp=%s", httpDir)
+libafb.notice(binder, "port=%d", port)
 
 # enter loopstart
 status= libafb.loopstart(binder, loopBinderCb)
