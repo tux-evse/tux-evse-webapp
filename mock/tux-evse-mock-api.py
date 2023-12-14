@@ -13,13 +13,20 @@ import os
 
 
 class PlugState(Enum):
-    DISCONNECTED = "disconnected"
-    CONNECTED_UNLOCKED = "connected and unlocked"
-    CONNECTED_LOCKED = "connected and locked"
-    ERROR = "error"
+    PLUG_IN = "connected and unlocked"
+    LOCK = "connected and locked"
+    ERROR = "error connect"
+    PLUG_OUT = "disconnected"
+    UNKNOWN = "unknow status"
 
 
-## static variables
+# Plug event
+evt_plug_id = None
+
+plugState = PlugState.PLUG_OUT
+
+
+# static variables
 count = 0
 durationSec = 0
 tic = 0
@@ -27,7 +34,6 @@ evtid = None
 btnStart = False
 energy = 44.1
 batCharge = 77.0
-plugState = PlugState.DISCONNECTED
 motorLockStatus = False
 chargeDurationSec = 0
 instantEnergy = 0.0
@@ -97,7 +103,7 @@ def getNetworkStatus():
     return wifiStatus, mobileStatus, ethernetStatus, nfcStatus
 
 
-def getVehicleStatus():
+def getVehiclePlugStatus():
     """
     Retrieve the current status of the vehicle.
 
@@ -112,7 +118,7 @@ def getVehicleStatus():
 
     """
     global plugState
-    return plugState
+    return plugState.name
 
 
 def authenticate():
@@ -183,8 +189,45 @@ def timerCB(timer, count, userdata):
     # return -1 # should exit timer
     return
 
+# ______________________________________________________________
+# timer handle callback
 
-## ping/pong test func
+
+def subscribe_plug_CB(rqt, *args):
+    libafb.notice(rqt, "subscribing api plug event")
+    libafb.evtsubscribe(rqt, evt_plug_id)
+    return 0  # implicit respond
+
+
+def unsubscribe_plug_CB(rqt, *args):
+    libafb.notice(rqt, "unsubscribing api plug event")
+    libafb.evtunsubscribe(rqt, evt_plug_id)
+    return 0  # implicit respond
+
+
+def setVehiclePlugStatus(index):
+    global plugState
+    L = list(PlugState)
+    if index <= len(L):
+        plugState = L[index]
+        return True
+    else:
+        return False
+
+# set test func
+
+
+def set_plug_CB(rqt, *args):
+    value = args[0]
+    if setVehiclePlugStatus(value):
+        return (0, {"VehiclePlugStatus": getVehiclePlugStatus()})
+    else:
+        return (1, {"Wrong VehiclePlugStatus"})
+# ______________________________________________________________
+
+# ping/pong test func
+
+
 def pingCB(rqt, *args):
     global count
     count += 1
@@ -212,7 +255,7 @@ def chargerInfoCB(rqt, *args):
 #     libafb.reply (rqt, 0, {'query': args})
 
 
-## executed when binder is ready to serv
+# executed when binder is ready to serv
 def loopBinderCb(binder, nohandle):
     libafb.notice(binder, "loopBinderCb=%s", libafb.config(binder, "uid"))
     return 0  # keep running for ever
@@ -225,23 +268,27 @@ def apiControlCb(api, state):
     apiname = libafb.config(api, "api")
     # WARNING: from Python 3.10 use switch-case as elseif replacement
     if state == "config":
-        libafb.notice(api, "api=[%s] 'info':[%s]", apiname, libafb.config(api, "info"))
+        libafb.notice(api, "api=[%s] 'info':[%s]",
+                      apiname, libafb.config(api, "info"))
 
     elif state == "ready":
-        tictime = libafb.config(api, "tictime") * 1000  # move from second to ms
-        libafb.notice(api, "api=[%s] start event tictime=%dms", apiname, tictime)
+        tictime = libafb.config(api, "tictime") * \
+            1000  # move from second to ms
+        libafb.notice(
+            api, "api=[%s] start event tictime=%dms", apiname, tictime)
 
         evtid = libafb.evtnew(api, "py-tux-evse-mock")
         if evtid is None:
             raise Exception("fail to create event")
 
+        evt_plug_id = libafb.evtnew(api, 'py-tux-evse-plug-mock')
+        if (evt_plug_id is None):
+            raise Exception('fail to create plug event')
+
         timer = libafb.timernew(
-            api,
-            {"uid": "py-timer", "callback": timerCB, "period": tictime, "count": 0},
-            ["my_user-data"],
-        )
-        if timer is None:
-            raise Exception("fail to create timer")
+            api, {'uid': 'py-timer', 'callback': timerCB, 'period': tictime, 'count': 0}, ["my_user-data"])
+        if (timer is None):
+            raise Exception('fail to create timer')
 
     elif state == "orphan":
         libafb.warning(api, "api=[%s] receive an orphan event", apiname)
@@ -249,7 +296,7 @@ def apiControlCb(api, state):
     return 0  # 0=ok -1=fatal
 
 
-## api verb list
+# api verb list
 demoVerbs = [
     {
         "uid": "py-ping",
@@ -275,10 +322,19 @@ demoVerbs = [
         "callback": chargerInfoCB,
         "info": "charger Info",
     },
+    # ______________________________________________________________
+    {'uid': 'py-set-plug', 'verb': 'set_plug', 'callback': set_plug_CB,
+        'info': 'set plug', 'action': ['PLUG_IN:', 'LOCK', 'ERROR', 'PLUG_OUT', 'UNKNOWN']},
+
+    {'uid': 'py-plug-subscribe', 'verb': 'subscribe_plug',
+        'callback': subscribe_plug_CB, 'info': 'subscribe to plug event'},
+    {'uid': 'py-plug-unsubscribe', 'verb': 'unsubscribe_plug',
+        'callback': unsubscribe_plug_CB, 'info': 'unsubscribe to plug event'},
+    # ______________________________________________________________
     # {'uid':'py-args', 'verb':'args', 'callback':argsCB, 'info':'py check input query', 'sample':[{'arg1':'arg-one', 'arg2':'arg-two'}, {'argA':1, 'argB':2}]},
 ]
 
-## define and instantiate API
+# define and instantiate API
 demoApi = {
     "uid": "py-tux-evse-mock",
     "api": "tux-evse-webapp-mock",
@@ -300,7 +356,8 @@ if os.environ.get("TUX_EVSE_NATIVE") is None:
 # Determine roothttp directory
 httpDir = os.environ.get("TUX_EVSE_WEBUI_DIR")
 if httpDir is None or not os.path.exists(httpDir):
-    parentCurDir = os.path.join(os.path.dirname(__file__), "..", "dist", "valeo")
+    parentCurDir = os.path.join(
+        os.path.dirname(__file__), "..", "dist", "valeo")
     if os.path.exists(parentCurDir):
         httpDir = parentCurDir
 if httpDir is None or not os.path.exists(httpDir):
