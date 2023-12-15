@@ -6,77 +6,333 @@
 # import libafb python glue
 # FIXME from afbpyglue import libafb
 from enum import Enum
+from enum import auto
 import time
 import _afbpyglue as libafb
 import random
 import os
+import datetime
+
+
+class IecState(Enum):
+    Bdf = auto()
+    Ef = auto()
+    Unset = auto()
+
+
+class PowerRequest(Enum):
+    Start = auto()
+    Stop = auto()
 
 
 class PlugState(Enum):
-    PLUG_IN = "connected and unlocked"
-    LOCK = "connected and locked"
-    ERROR = "error connect"
-    PLUG_OUT = "disconnected"
-    UNKNOWN = "unknow status"
+    PlugIn = "connected and unlocked"
+    Lock = "connected and locked"
+    Error = "error connect"
+    PlugOut = "disconnected"
+    Unknown = "unknow status"
 
 
-# Plug event
+class Iso15118State(Enum):
+    Iso20 = auto()
+    Iso2 = auto()
+    Iec = auto()
+    Unset = auto()
+
+
+# Nrj event
+evt_nrj_id = None
+
+energy = 0
+# charge_bat = 0
+charge_power = 0.0
+duration = 0
+# chargeDurationSec = 0
+
+# Vehicle event
 evt_plug_id = None
 
-plugState = PlugState.PLUG_OUT
+iecState = IecState.Bdf
+powerRequest = PowerRequest.Stop
+plugState = PlugState.PlugOut
+iso15118State = Iso15118State.Iso20
+# smart charging
+# iso15118Status = False
+# pncStatus = False
+# v2gStatus = False
+power_imax = 100
+# btnStart = False
+# motorLockStatus = False
 
+# network status
+evt_net_id = None
 
-# static variables
+wifi_status = False
+mobile_status = False
+ethernet_status = False
+nfc_status = False
+
+# static mock variables
 count = 0
-durationSec = 0
 tic = 0
 evtid = None
-btnStart = False
-energy = 44.1
-batCharge = 77.0
-motorLockStatus = False
-chargeDurationSec = 0
-instantEnergy = 0.0
-totalEnergy = 0.0
+
 informationArea = ""
-# network status
-wifiStatus = False
-mobileStatus = False
-ethernetStatus = False
-nfcStatus = False
-# smart charging
-iso15118Status = False
-pncStatus = False
-v2gStatus = False
 
 
-# stopwatch function and display the timer in the UI format in hours:minutes:seconds
-def stopwatch():
+# ______________________________________________________________
+# Nrj event
+
+energy = 0
+# charge_bat = 0
+charge_power = 1253.0
+duration = 0
+
+
+def getChargerInfo():
     """
-    A stopwatch function that measures the elapsed time and displays it in the format "hours:minutes:seconds".
+    Generate the information about the charger.
 
     Parameters:
         None
 
     Returns:
-        elapsed_time (str): The elapsed time in the format "hours:minutes:seconds".
+        dict: A dictionary containing the following information:
+            - energy (float): The amount of energy.
+            - duration (str): The duration in the format '01:02:%02d'.
+            # - temp (int): The temperature in degrees Celsius.
     """
-    start_time = time.time()
+    global duration
+    global energy
+    
+    duration += 1
+    
+    energy += 0.5
+    
+    tmp_charge = charge_power + random.randint(-100, 100)/10.
+    return {
+        "energy": str(energy),
+        "charge_power": str(tmp_charge),
+        "duration": str(datetime.timedelta(seconds=duration)),
+    }
 
-    # Perform some task or wait for a certain period of time
-    end_time = time.time()
-    elapsed_time = end_time - start_time
+# timer handle callback
 
-    # Convert elapsed_time to hours, minutes, and seconds
-    hours = int(elapsed_time // 3600)
-    minutes = int((elapsed_time % 3600) // 60)
-    seconds = int(elapsed_time % 60)
 
-    # Format the elapsed time as "hours:minutes:seconds"
-    elapsed_time_formatted = f"{hours:02}:{minutes:02}:{seconds:02}"
+def timerCB(timer, count, userdata):
+    """
+    Callback function for the timer.
 
-    return elapsed_time_formatted
+    Args:
+        timer: The timer object.
+        count: The number of times the timer has been called.
+        userdata: Any user-defined data associated with the timer.
 
+    Returns:
+        None
+    """
+    global tic
+    tic += 1
+    chInfo = getChargerInfo()
+    #batInfo = getBatteryInfo()
+    '''
+    libafb.debug(
+        timer,
+        "timer':%s' tic=%d, chargerInfo={%d, %s, %d}, batteryInfo=%s",
+        libafb.config(timer, "uid"),
+        tic,
+        chInfo["energy"],
+        chInfo["duration"],
+        chInfo["temp"],
+        batInfo["chargeValue"],
+    )
+    '''
+    # libafb.evtpush(evtid, {"chargerInfo": chInfo, "batteryInfo": batInfo})
+    libafb.evtpush(evtid, chInfo)
+    # return -1 # should exit timer
+    return
+
+
+# ______________________________________________________________
+# Vehicle event
+
+def get_PlugState_list():
+    L = []
+    for i in PlugState:
+        L.append(i.name)
+    return L
+
+
+def get_Iso15118State_list():
+    L = []
+    for i in Iso15118State:
+        L.append(i.name)
+    return L
+
+
+def get_Power_imax_list():
+    return [1220, 1350, 2000, 4500, 6500]
+
+
+def get_IecState_list():
+    L = []
+    for i in IecState:
+        L.append(i.name)
+    return L
+
+
+def get_PowerRequest_list():
+    L = []
+    for i in PowerRequest:
+        L.append(i.name)
+    return L
+
+
+def getIecState():
+    global iecState
+    return iecState.name
+
+
+def getPowerRequest():
+    global powerRequest
+    return powerRequest.name
+
+
+def getPlugState():
+    global plugState
+    return plugState.name
+
+
+def getIso15118State():
+    global iso15118State
+    return iso15118State.name
+
+
+def getPower_imax():
+    global power_imax
+    return power_imax
+
+
+def subscribe_plug_CB(rqt, *args):
+    libafb.notice(rqt, "subscribing api plug event")
+    libafb.evtsubscribe(rqt, evt_plug_id)
+    return 0  # implicit respond
+
+
+def unsubscribe_plug_CB(rqt, *args):
+    libafb.notice(rqt, "unsubscribing api plug event")
+    libafb.evtunsubscribe(rqt, evt_plug_id)
+    return 0  # implicit respond
+
+
+def setPlugState(val):
+    global plugState
+    if val in get_PlugState_list():
+        plugState = PlugState[val]
+        return True
+    else:
+        return False
+
+
+def setPowerRequest(index):
+    global powerRequest
+    if index in get_PowerRequest_list():
+        powerRequest = PowerRequest[index]
+        return True
+    else:
+        return False
+
+
+def setPower_imax(val):
+    global power_imax
+    if val > 0:
+        power_imax = val
+        return True
+    else:
+        return False
+
+
+def setIso15118State(index):
+    global iso15118State
+    if index in get_Iso15118State_list():
+        iso15118State = Iso15118State[index]
+        return True
+    else:
+        return False
+
+
+def setIecState(index):
+    global iecState
+    if index in get_IecState_list():
+        iecState = IecState[index]
+        return True
+    else:
+        return False
+
+
+def getVehicleState():
+
+    return {
+        "plugged": getPlugState(),
+        "power_request": getPowerRequest(),
+        "power_imax": getPower_imax(),
+        "iso15118": getIso15118State(),
+        "iec_state": getIecState()
+    }
+
+
+def setIecState_CB(rqt, *args):
+    if setIecState(args[0]):
+        vehicleInfo = getVehicleState()
+
+        libafb.evtpush(evt_plug_id, vehicleInfo)
+        return (0, vehicleInfo)
+    else:
+        return (1, {"Wrong VehiclePlugStatus"})
+
+
+def setPowerRequest_CB(rqt, *args):
+    if setPowerRequest(args[0]):
+        vehicleInfo = getVehicleState()
+
+        libafb.evtpush(evt_plug_id, vehicleInfo)
+        return (0, vehicleInfo)
+    else:
+        return (1, {"Wrong VehiclePlugStatus"})
+
+
+def setPlugState_CB(rqt, *args):
+    if setPlugState(args[0]):
+        vehicleInfo = getVehicleState()
+        print("vehicleInfo", vehicleInfo)
+        libafb.evtpush(evt_plug_id, vehicleInfo)
+        return (0, vehicleInfo)
+    else:
+        return (1, {"Wrong VehiclePlugStatus"})
+
+
+def setIso15118State_CB(rqt, *args):
+    if setIso15118State(args[0]):
+        vehicleInfo = getVehicleState()
+
+        libafb.evtpush(evt_plug_id, vehicleInfo)
+        return (0, vehicleInfo)
+    else:
+        return (1, {"Wrong VehiclePlugStatus"})
+
+
+def setPower_imax_CB(rqt, *args):
+    if setPower_imax(args[0]):
+        vehicleInfo = getVehicleState()
+
+        libafb.evtpush(evt_plug_id, vehicleInfo)
+        return (0, vehicleInfo)
+    else:
+        return (1, {"Wrong Power_imax"})
+
+
+# ______________________________________________________________
+# network status
 
 def getNetworkStatus():
     """
@@ -102,127 +358,6 @@ def getNetworkStatus():
     nfcStatus = not nfcStatus
     return wifiStatus, mobileStatus, ethernetStatus, nfcStatus
 
-
-def getVehiclePlugStatus():
-    """
-    Retrieve the current status of the vehicle.
-
-    This function returns the value of the global variable `PlugState`, which represents
-    the state of the vehicle's plug.
-
-    Parameters:
-        None
-
-    Returns:
-        The current status of the vehicle's plug (PlugState).
-
-    """
-    global plugState
-    return plugState.name
-
-
-def authenticate():
-    global nfcStatus
-    if nfcStatus:
-        return True
-    else:
-        return False
-
-
-def getChargerInfo():
-    """
-    Generate the information about the charger.
-
-    Parameters:
-        None
-
-    Returns:
-        dict: A dictionary containing the following information:
-            - energy (float): The amount of energy.
-            - duration (str): The duration in the format '01:02:%02d'.
-            # - temp (int): The temperature in degrees Celsius.
-    """
-    global durationSec
-    global energy
-    temp = random.randint(0, 90)
-    durationSec += 1
-    energy += 0.5
-    duration = "01:02:%02d" % (durationSec % 60)
-    return {"energy": energy, "duration": duration, "temp": temp}
-
-
-def getBatteryInfo():
-    global batCharge
-    batCharge += 0.1
-    batStr = "{:3.1f}".format(batCharge)
-    return {"chargeValue": batStr}
-
-
-# timer handle callback
-def timerCB(timer, count, userdata):
-    """
-    Callback function for the timer.
-
-    Args:
-        timer: The timer object.
-        count: The number of times the timer has been called.
-        userdata: Any user-defined data associated with the timer.
-
-    Returns:
-        None
-    """
-    global tic
-    tic += 1
-    chInfo = getChargerInfo()
-    batInfo = getBatteryInfo()
-    libafb.debug(
-        timer,
-        "timer':%s' tic=%d, chargerInfo={%d, %s, %d}, batteryInfo=%s",
-        libafb.config(timer, "uid"),
-        tic,
-        chInfo["energy"],
-        chInfo["duration"],
-        chInfo["temp"],
-        batInfo["chargeValue"],
-    )
-    libafb.evtpush(evtid, {"chargerInfo": chInfo, "batteryInfo": batInfo})
-    # return -1 # should exit timer
-    return
-
-# ______________________________________________________________
-# timer handle callback
-
-
-def subscribe_plug_CB(rqt, *args):
-    libafb.notice(rqt, "subscribing api plug event")
-    libafb.evtsubscribe(rqt, evt_plug_id)
-    return 0  # implicit respond
-
-
-def unsubscribe_plug_CB(rqt, *args):
-    libafb.notice(rqt, "unsubscribing api plug event")
-    libafb.evtunsubscribe(rqt, evt_plug_id)
-    return 0  # implicit respond
-
-
-def setVehiclePlugStatus(index):
-    global plugState
-    L = list(PlugState)
-    if index <= len(L):
-        plugState = L[index]
-        return True
-    else:
-        return False
-
-# set test func
-
-
-def set_plug_CB(rqt, *args):
-    value = args[0]
-    if setVehiclePlugStatus(value):
-        return (0, {"VehiclePlugStatus": getVehiclePlugStatus()})
-    else:
-        return (1, {"Wrong VehiclePlugStatus"})
 # ______________________________________________________________
 
 # ping/pong test func
@@ -264,6 +399,7 @@ def loopBinderCb(binder, nohandle):
 # When Api ready (state==init) start event & timer
 def apiControlCb(api, state):
     global evtid
+    global evt_plug_id
 
     apiname = libafb.config(api, "api")
     # WARNING: from Python 3.10 use switch-case as elseif replacement
@@ -272,16 +408,16 @@ def apiControlCb(api, state):
                       apiname, libafb.config(api, "info"))
 
     elif state == "ready":
-        tictime = libafb.config(api, "tictime") * \
-            1000  # move from second to ms
+        # move from second to ms
+        tictime = libafb.config(api, "tictime") * 1000
         libafb.notice(
             api, "api=[%s] start event tictime=%dms", apiname, tictime)
 
-        evtid = libafb.evtnew(api, "py-tux-evse-mock")
+        evtid = libafb.evtnew(api, "evt-nrj-status")
         if evtid is None:
             raise Exception("fail to create event")
 
-        evt_plug_id = libafb.evtnew(api, 'py-tux-evse-plug-mock')
+        evt_plug_id = libafb.evtnew(api, 'evt-plug-status')
         if (evt_plug_id is None):
             raise Exception('fail to create plug event')
 
@@ -299,37 +435,79 @@ def apiControlCb(api, state):
 # api verb list
 demoVerbs = [
     {
-        "uid": "py-ping",
+        "uid": "ping",
         "verb": "ping",
         "callback": pingCB,
         "info": "py ping demo function",
     },
     {
-        "uid": "py-subscribe",
+        "uid": "subscribe",
         "verb": "subscribe",
         "callback": subscribeCB,
         "info": "subscribe to event",
     },
     {
-        "uid": "py-unsubscribe",
+        "uid": "unsubscribe",
         "verb": "unsubscribe",
         "callback": unsubscribeCB,
         "info": "unsubscribe to event",
     },
     {
-        "uid": "py-charger-info",
+        "uid": "charger-info",
         "verb": "charger-info",
         "callback": chargerInfoCB,
         "info": "charger Info",
     },
     # ______________________________________________________________
-    {'uid': 'py-set-plug', 'verb': 'set_plug', 'callback': set_plug_CB,
-        'info': 'set plug', 'action': ['PLUG_IN:', 'LOCK', 'ERROR', 'PLUG_OUT', 'UNKNOWN']},
+    # Vehicle event
 
-    {'uid': 'py-plug-subscribe', 'verb': 'subscribe_plug',
-        'callback': subscribe_plug_CB, 'info': 'subscribe to plug event'},
-    {'uid': 'py-plug-unsubscribe', 'verb': 'unsubscribe_plug',
-        'callback': unsubscribe_plug_CB, 'info': 'unsubscribe to plug event'},
+    {
+        'uid': 'set-IecState',
+        'verb': 'set-IecState',
+        'callback': setIecState_CB,
+        'info': 'set IecState',
+        'sample': get_IecState_list()
+    },
+    {
+        'uid': 'set-PowerRequest',
+        'verb': 'set-PowerRequest',
+        'callback': setPowerRequest_CB,
+        'info': 'set PowerRequest',
+        'sample': get_PowerRequest_list()
+    },
+    {
+        'uid': 'set-PlugState',
+        'verb': 'set-PlugState',
+        'callback': setPlugState_CB,
+        'info': 'set PlugState',
+        'sample': get_PlugState_list()
+    },
+    {
+        'uid': 'set-Iso15118State',
+        'verb': 'set-Iso15118State',
+        'callback': setIso15118State_CB,
+        'info': 'set Iso15118State',
+        'sample': get_Iso15118State_list()
+    },
+    {
+        'uid': 'set-Power_imax',
+        'verb': 'set-Power_imax',
+        'callback': setPower_imax_CB,
+        'info': 'set Power imax',
+        'sample': get_Power_imax_list()
+    },
+    {
+        'uid': 'vehicleState-subscribe',
+        'verb': 'subscribe_vehicleState',
+        'callback': subscribe_plug_CB,
+        'info': 'subscribe to plug event'
+    },
+    {
+        'uid': 'vehicleState-unsubscribe',
+        'verb': 'unsubscribe_vehicleState',
+        'callback': unsubscribe_plug_CB,
+        'info': 'unsubscribe to plug event'
+    },
     # ______________________________________________________________
     # {'uid':'py-args', 'verb':'args', 'callback':argsCB, 'info':'py check input query', 'sample':[{'arg1':'arg-one', 'arg2':'arg-two'}, {'argA':1, 'argB':2}]},
 ]
@@ -342,8 +520,9 @@ demoApi = {
     "info": "Tux EVSE mock",
     "control": apiControlCb,
     "tictime": 1,
-    "verbose": 9,
+    "verbose": 255,
     "export": "public",
+    'uri': 'unix:@tux-evse-webapp-mock',
     "verbs": demoVerbs,
 }
 
