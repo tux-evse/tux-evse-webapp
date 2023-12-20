@@ -551,7 +551,7 @@ if httpDir is None:
 
 # allow to force the port number only in native mode
 # Note: set to 0 to let framework use/determine default port
-port = int(os.environ.get("TUX_EVSE_MOCK_PORT", 1235))
+port = int(os.environ.get("TUX_EVSE_MOCK_PORT", 1236))
 
 # Verbosity : set to 255 => info, 1023 => debug
 verbose = int(os.environ.get("TUX_EVSE_MOCK_VERBOSE", 3))
