@@ -18,6 +18,7 @@ import { HeaderComponent } from './header/header.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { StartStopComponent } from './start-stop/start-stop.component';
 import { BorneInformationComponent } from './borne-information/borne-information.component';
+import { StatusNfcComponent } from './status-nfc/status-nfc.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { BorneInformationComponent } from './borne-information/borne-information
     DetailsComponent,
     HeaderComponent,
     StartStopComponent,
-    BorneInformationComponent
+    BorneInformationComponent,
+    StatusNfcComponent
   ],
   imports: [
     BrowserModule,
