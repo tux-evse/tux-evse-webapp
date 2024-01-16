@@ -398,6 +398,16 @@ def loopBinderCb(binder, nohandle):
 
 # When Api ready (state==init) start event & timer
 def apiControlCb(api, state):
+    """
+    Callback function for controlling the API.
+
+    Args:
+        api: The API object.
+        state: The state of the API.
+
+    Returns:
+        int: Always returns 0.
+    """
     global evtid
     global evt_plug_id
 
@@ -559,10 +569,14 @@ verbose = int(os.environ.get("TUX_EVSE_MOCK_VERBOSE", 3))
 # define and instantiate libafb-binder
 demoOpts = {
     "uid": "py-binder",
-    "verbose": 3,
+    "verbose": 255,
     "rootdir": ".",
     "roothttp": httpDir,
     "port": port,
+    # "https-cert": "/etc/pki/tls/certs/cert.pem",
+    # "https-key": "/etc/pki/tls/private/privkey.pem"
+    "https-cert": "/home/sylvain/Work/PROJETS/valeo_charger/Devel/certificats/cert.pem",
+    "https-key": "/home/sylvain/Work/PROJETS/valeo_charger/Devel/certificats/privkey.pem"
 }
 
 # create alias on devtools (accessible localhost:xxxx/devtools) only when installed
@@ -570,7 +584,26 @@ devToolPath = "/usr/share/afb-ui-devtools/binder"
 if os.path.exists(httpDir):
     demoOpts["alias"] = ["/devtools:" + devToolPath]
 
+if True:
+    def readfile(filename):
+        """
+        Read the content of a file and return it as a string.
+
+        Parameters:
+            filename (str): The name of the file to read.
+
+        Returns:
+            str: The content of the file as a string.
+        """
+        with open(filename) as f:
+            return f.read()
+    if "https-cert" in demoOpts :
+        demoOpts["https-cert"] = readfile(demoOpts["https-cert"]) 
+    if "https-key" in demoOpts :
+        demoOpts["https-key"] = readfile(demoOpts["https-key"])
+
 # instantiate binder and API
+print("demoOpts", demoOpts)
 binder = libafb.binder(demoOpts)
 myapi = libafb.apicreate(demoApi)
 

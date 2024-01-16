@@ -5,8 +5,12 @@
 :root {
     --green-color: #82e500;
     --bluetooth-color: #2344e8;
+    --blue-color: #0060df;
+    --yellow-color: #ffff00ff;
+    --orange-color: #ff7f2aff;
     --bluelight-color: #9dc3e6;
     --red-color: #dc3545;
+    --violet: #8d4b98;
     --off-color: lightgray;
 }
 
@@ -15,22 +19,46 @@
 }
 
 .off {
+    color: var(--off-color);
+}
+
+.error {
     color: var(--red-color);
+}
+
+.intermediate {
+    color: var(--orange-color);
 }
 
 .picto svg {
     height: 60px;
 }
 
-.picto .bi-wifi {
-    fill: var(--green-color);
-}
-
-.picto .bi-reception-4 {
-    fill: var(--bluelight-color);
+.drop-shadow {
+    filter: drop-shadow(1px 1px 1px #000);
 }
 
 .hr-blurry {
     background-color: transparent;
     background-image: linear-gradient(90deg, transparent, #666, transparent);
 }
+/* EV Station Status*/
+.reserved {
+    color: var(--yellow-color);
+}
+.available {
+    color: var(--green-color);
+}
+.charging {
+    color: var(--blue-color);
+}
+.pending-autho {
+    color: var(--orange-color);
+}
+.completed {
+    color: var(--green-color);
+}
+.out-of-order {
+    color: var(--red-color);
+}
+/* /EV Station Status*/

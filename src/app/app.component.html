@@ -8,10 +8,12 @@
     </div>
 
     <div class="row">
-        <div class="col-12 col-md-8">
-            <app-status-plug />
-            <app-start-stop />
+        <div class="col-6 col-md-4">
             <app-borne-information />
+        </div>
+        <div class="col-6 col-md-4">
+            <app-status-plug />
+            <!-- <app-status-battery /> -->
         </div>
         <div class="col-12 col-md-4">
             <app-charge-information />
@@ -24,14 +26,14 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-2">
-            <app-status-battery />
+    <div class="row align-items-center">
+        <div class="col-12 col-md-4 mb-3 text-center">
+            <app-start-stop />
         </div>
-        <div class="col-8 col-md-8 text-center">
+        <div class="col-12 col-md-4 mb-3 text-center">
             <app-status-nfc />
         </div>
-        <div class="col-2">
+        <div class="col-12 col-md-4 mb-3">
             <app-smart-charging />
         </div>
     </div>

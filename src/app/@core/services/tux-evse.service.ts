@@ -13,6 +13,10 @@ export interface IBatteryInfo {
     chargeValue: Number;
 }
 
+export interface IborneStatus {
+    borneStatus: Number;
+}
+
 
 @Injectable()
 export class TuxEVSEService {

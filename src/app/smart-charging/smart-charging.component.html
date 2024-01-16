@@ -1,15 +1,26 @@
 <div class="row" style="border: 2px dashed;">
     <div class="col">
         <div class="table-responsive">
-            <p style="font-size: 20px;font-weight: 800;text-align: center;">Smart Charging</p>
+            <p style="font-size: 20px;font-weight: 800;text-align: center;">test & debug indicators</p>
             <table>
+                <tr>
+                    <td>
+                        OCPP
+                    </td>
+                    <td>
+                        <label class="switch">
+                            <input type="checkbox" disabled [checked]="ocppChecked">
+                            <span class="slider round"></span>
+                        </label>
+                    </td>
+                </tr>
                 <tr>
                     <td>
                         ISO 15118
                     </td>
                     <td>
                         <label class="switch">
-                            <input type="checkbox">
+                            <input type="checkbox" disabled [checked]="iso15118Checked">
                             <span class="slider round"></span>
                         </label>
                     </td>
@@ -18,7 +29,7 @@
                     <td>PnC</td>
                     <td>
                         <label class="switch">
-                            <input type="checkbox">
+                            <input type="checkbox" disabled [checked]="pncChecked">
                             <span class="slider round"></span>
                         </label>
                     </td>
@@ -27,16 +38,16 @@
                     <td>V2G</td>
                     <td>
                         <label class="switch">
-                            <input type="checkbox">
+                            <input type="checkbox" disabled [checked]="v2gChecked">
                             <span class="slider round"></span>
                         </label>
                     </td>
                 </tr>
                 <tr>
-                    <td>Badge</td>
+                    <td>Need Badge / Free</td>
                     <td>
                         <label class="switch">
-                            <input type="checkbox">
+                            <input type="checkbox" disabled [checked]="badgeChecked">
                             <span class="slider round"></span>
                         </label>
                     </td>

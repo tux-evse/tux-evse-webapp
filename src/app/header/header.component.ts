@@ -12,6 +12,9 @@ export class HeaderComponent implements OnInit {
   wsStatus$: Observable<SocketStatus>;
 
   wifiStatus: string = 'off';
+  nfcStatus: string = 'off';
+  ethernetStatus: string = 'off';
+  mobileStatus: string = 'off';
 
   constructor(
     private afbService: AFBWebSocketService,
@@ -36,8 +39,14 @@ export class HeaderComponent implements OnInit {
     this.afbService.Status$.subscribe(status => {
       if (status.connected) {
         this.wifiStatus = 'on';
+        this.nfcStatus = 'on';
+        this.ethernetStatus = 'on';
+        this.mobileStatus = 'on';
       } else {
         this.wifiStatus = 'off';
+        this.nfcStatus = 'off';
+        this.ethernetStatus = 'off';
+        this.mobileStatus = 'off';
       }
       console.log('AFB connection status:', status);
     })
