@@ -34,7 +34,7 @@ for file in files:
     with open(file, 'w') as ori_file:
         ori_file.write(new_lines)
 
-capi_map="./rust_assets/@img-assets.c"
+capi_map="../rust_assets/@img-assets.c"
 new_lines=""
 with open(capi_map, 'r') as ori_file:
         is_inserted=False
@@ -57,7 +57,7 @@ with open(capi_map, 'r') as ori_file:
 with open(capi_map, 'w') as ori_file:
     ori_file.write(new_lines)
     
-capi_map="./rust_assets/@img-assets.rs"
+capi_map="../rust_assets/@img-assets.rs"
 new_lines=""
 with open(capi_map, 'r') as ori_file:
         is_inserted=False
