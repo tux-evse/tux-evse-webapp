@@ -659,7 +659,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_PLUG_CONN
 #endif
 };
 
-const lv_img_dsc_t plug_connected_unlocked = {
+const lv_img_dsc_t img_img_img_plug_connected_unlocked = {
   .header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA,
   .header.always_zero = 0,
   .header.reserved = 0,

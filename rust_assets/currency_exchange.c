@@ -17,11 +17,11 @@
 #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_CURRENCY-EXCHANGE
-#define LV_ATTRIBUTE_IMG_CURRENCY-EXCHANGE
+#ifndef LV_ATTRIBUTE_IMG_CURRENCY_EXCHANGE
+#define LV_ATTRIBUTE_IMG_CURRENCY_EXCHANGE
 #endif
 
-const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CURRENCY-EXCHANGE uint8_t currency-exchange_map[] = {
+const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CURRENCY_EXCHANGE uint8_t currency_exchange_map[] = {
 #if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
   /*Pixel format: Alpha 8 bit, Red: 3 bit, Green: 3 bit, Blue: 2 bit*/
   0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0x00, 0xb2, 0x00, 0xe9, 0x00, 0xe6, 0x00, 0xc3, 0x00, 0x5a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
@@ -99,12 +99,12 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CURRENCY-
 #endif
 };
 
-const lv_img_dsc_t currency-exchange = {
+const lv_img_dsc_t img_currency_exchange = {
   .header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA,
   .header.always_zero = 0,
   .header.reserved = 0,
   .header.w = 16,
   .header.h = 16,
   .data_size = 256 * LV_IMG_PX_SIZE_ALPHA_BYTE,
-  .data = currency-exchange_map,
+  .data = currency_exchange_map,
 };

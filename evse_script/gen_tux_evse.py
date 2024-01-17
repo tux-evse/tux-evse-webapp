@@ -2,7 +2,7 @@
 
 import glob
 
-path = r'*.c'
+path = r'../rust_assets/*.c'
 files = glob.glob(path)
 
 prefix="img_"
@@ -23,6 +23,9 @@ def get_lv_img_name_in_file(file):
 
 for file in files:
     new_lines = ""
+    if file == "@img-assets.c":
+        continue
+    
     with open(file, 'r') as ori_file:
         match_to="const lv_img_dsc_t "
         for line in ori_file:
@@ -45,7 +48,9 @@ with open(capi_map, 'r') as ori_file:
                 is_inserted=True
                 new_lines+=match_begin_to+"\n"
                 for file in files:
-                    new_lines+="#include \"%s\"\n" % file
+                    if "@img-assets.c" in file:
+                        continue
+                    new_lines+="#include \"%s\"\n" % file[ file.rfind("/")+1:]
             elif is_inserted and line.startswith(match_end_to) :
                 is_inserted=False
                 new_lines+=line
@@ -68,6 +73,9 @@ with open(capi_map, 'r') as ori_file:
                 is_inserted=True
                 new_lines+=match_begin_to+"\n"
                 for file in files:
+                    if "@img-assets.c" in file:
+                        continue
+                    print(file)
                     shortname=get_lv_img_name_in_file(file)
                     new_lines+="    impl_static_imgbin! (%s, %s);\n" % (shortname[len(prefix):], shortname)
             elif is_inserted and line.startswith(match_end_to) :
