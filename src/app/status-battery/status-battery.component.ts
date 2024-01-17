@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AFBWebSocketService } from '../@core/services/AFB-websocket.service';
-import { IBatteryInfo, TuxEVSEService } from '../@core/services/tux-evse.service';
+import { IBatteryInfo, EngyService } from '../@core/services/engy-service';
 
 
 @Component({
@@ -16,10 +16,10 @@ export class StatusBatteryComponent implements OnInit {
     /**
      * Constructs a new instance of the class.
      *
-     * @param {TuxEVSEService} tuxEvseService - The TuxEVSEService instance.
+     * @param {EngyService} EngyService - The EngyService instance.
      */
     constructor(
-        private tuxEvseService: TuxEVSEService,
+        private EngyService: EngyService,
     ) {
     }
 
@@ -30,7 +30,7 @@ export class StatusBatteryComponent implements OnInit {
      */
     ngOnInit() {
         // Retrieve data from service
-        this.tuxEvseService.getBatteryInfo$().subscribe(data => {
+        this.EngyService.getBatteryInfo$().subscribe(data => {
             this.battery = data;
         })
     }

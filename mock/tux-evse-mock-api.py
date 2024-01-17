@@ -360,6 +360,31 @@ def getNetworkStatus():
 
 # ______________________________________________________________
 
+def overCurrentCB(rqt, *args):
+    global overcurrent
+    overcurrent = 0
+    return (0, {"tag": "OverCurrent", "total": overcurrent, "l1": overcurrent, "l2": overcurrent, "l3": overcurrent})
+
+def tensionVoltsCB(rqt, *args):
+    global tensionVolts
+    return tensionVolts
+
+def energyWattCB(rqt, *args):
+    global energyWatt
+    return energyWatt
+
+def currentAmpsCB(rqt, *args):
+    global currentAmps
+    return currentAmps
+
+def powerWattCB(rqt, *args):
+    global powerWatt
+    return powerWatt
+
+def configEnergyCB(rqt, *args):
+    global configEnergy
+    return configEnergy
+
 # ping/pong test func
 
 
@@ -443,7 +468,43 @@ def apiControlCb(api, state):
 
 
 # api verb list
-demoVerbs = [
+engyVerbs = [
+    {
+        "uid": "over-current",
+        "verb": "over-current",
+        "callback": overCurrentCB,
+        "info": "current over current(adps) in A",
+    },
+    {
+        "uid": "tension-volts",
+        "verb": "tension-volts",
+        "callback": tensionVoltsCB,
+        "info": "tension in volt*100",
+    },
+    {
+        "uid": "energy-watt",
+        "verb": "energy-watt",
+        "callback": energyWattCB,
+        "info": "energy in watt*100",
+    },
+    {
+        "uid": "current-amps",
+        "verb": "current-amps",
+        "callback": currentAmpsCB,
+        "info": "current in amps*100",
+    },
+    {
+        "uid": "power-Watt",
+        "verb": "power-Watt",
+        "callback": powerWattCB,
+        "info": "power in Watt*100",
+    },
+    {
+        "uid": "config-energy",
+        "verb": "config-energy",
+        "callback": configEnergyCB,
+        "info": "configure max power/current",
+    },
     {
         "uid": "ping",
         "verb": "ping",
@@ -523,23 +584,22 @@ demoVerbs = [
 ]
 
 # define and instantiate API
-demoApi = {
-    "uid": "py-tux-evse-mock",
-    "api": "tux-evse-webapp-mock",
+engyApi = {
+    "uid": "py-engy-mock",
+    "api": "engy",
     "class": "test",
-    "info": "Tux EVSE mock",
+    "info": "Tux EVSE engy mock",
     "control": apiControlCb,
     "tictime": 1,
     "verbose": 255,
     "export": "public",
-    'uri': 'unix:@tux-evse-webapp-mock',
-    "verbs": demoVerbs,
+    'uri': 'unix:@engy',
+    "verbs": engyVerbs,
 }
 
 # On target, export api
 if os.environ.get("TUX_EVSE_NATIVE") is None:
-    demoApi["uri"] = "sd:tux-evse-webapp-mock"
-#   demoApi['uri'] ='sd:tux-evse-mock?as-api=tux-evse-webapp-mock'
+    engyApi["uri"] = "sd:engy"
 
 
 # Determine roothttp directory
@@ -605,7 +665,7 @@ if True:
 # instantiate binder and API
 print("demoOpts", demoOpts)
 binder = libafb.binder(demoOpts)
-myapi = libafb.apicreate(demoApi)
+myapi = libafb.apicreate(engyApi)
 
 libafb.notice(
     binder, "CONF:\n\t verbose=%d\n\t port=%d\n\t roothttp=%s", verbose, port, httpDir

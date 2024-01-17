@@ -12,13 +12,16 @@ import { ZoneMessageComponent } from './zone-message/zone-message.component';
 import { SmartChargingComponent } from './smart-charging/smart-charging.component';
 import { DetailsComponent } from './details/details.component';
 import { AFBWebSocketService } from './@core/services/AFB-websocket.service';
-import { TuxEVSEService } from './@core/services/tux-evse.service';
+import { EngyService } from './@core/services/engy-service';
 import { ChargeInformationComponent } from './charge-information/charge-information.component';
 import { HeaderComponent } from './header/header.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { StartStopComponent } from './start-stop/start-stop.component';
 import { BorneInformationComponent } from './borne-information/borne-information.component';
 import { StatusNfcComponent } from './status-nfc/status-nfc.component';
+import { FooterComponent } from './footer/footer.component';
+import { AuthService } from './@core/services/auth-service';
+import { ChMgrService } from './@core/services/charging-manager-service';
 
 @NgModule({
   declarations: [
@@ -35,7 +38,8 @@ import { StatusNfcComponent } from './status-nfc/status-nfc.component';
     HeaderComponent,
     StartStopComponent,
     BorneInformationComponent,
-    StatusNfcComponent
+    StatusNfcComponent,
+    FooterComponent
   ],
   imports: [
     BrowserModule,
@@ -44,7 +48,9 @@ import { StatusNfcComponent } from './status-nfc/status-nfc.component';
   ],
   providers: [
     AFBWebSocketService,
-    TuxEVSEService,
+    EngyService,
+    AuthService,
+    ChMgrService,
 ],
   bootstrap: [AppComponent]
 })

@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { AFBWebSocketService, SocketStatus } from '../@core/services/AFB-websocket.service';
 
 @Component({
@@ -7,9 +7,11 @@ import { AFBWebSocketService, SocketStatus } from '../@core/services/AFB-websock
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   title = 'valeo';
   wsStatus$: Observable<SocketStatus>;
+
+  onDestroy: Subject<boolean> = new Subject();
 
   wifiStatus: string = 'off';
   nfcStatus: string = 'off';
@@ -18,7 +20,7 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     private afbService: AFBWebSocketService,
-  ) {
+  ){
     afbService.Init('api', 'HELLO');
     // if (environment.production) {
         this.afbService.SetURL(window.location.host);
@@ -36,7 +38,9 @@ export class HeaderComponent implements OnInit {
    * Connects to the afbService.
    */
   ngOnInit() {
-    this.afbService.Status$.subscribe(status => {
+   this.afbService.Status$.pipe(
+      takeUntil(this.onDestroy)
+    ).subscribe(status => {
       if (status.connected) {
         this.wifiStatus = 'on';
         this.nfcStatus = 'on';
@@ -51,6 +55,11 @@ export class HeaderComponent implements OnInit {
       console.log('AFB connection status:', status);
     })
     this.afbService.Connect();
+  }
+
+  ngOnDestroy() {
+    this.onDestroy.next(true);
+    this.onDestroy.complete();
   }
 
   restartConnection() {
