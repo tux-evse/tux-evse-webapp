@@ -435,7 +435,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_BATTERY_C
 #endif
 };
 
-const lv_img_dsc_t img_img_img_battery_charge_on = {
+const lv_img_dsc_t img_battery_charge_on = {
   .header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA,
   .header.always_zero = 0,
   .header.reserved = 0,

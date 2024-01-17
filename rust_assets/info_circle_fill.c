@@ -115,7 +115,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_INFO_CIRC
 #endif
 };
 
-const lv_img_dsc_t img_img_img_info_circle_fill = {
+const lv_img_dsc_t img_info_circle_fill = {
   .header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA,
   .header.always_zero = 0,
   .header.reserved = 0,
