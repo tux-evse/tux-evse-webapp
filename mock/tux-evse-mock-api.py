@@ -30,7 +30,7 @@ class PlugState(Enum):
     Lock = "connected and locked"
     Error = "error connect"
     PlugOut = "disconnected"
-    Unknown = "unknow status"
+    Unknown = "unknown status"
 
 
 class Iso15118State(Enum):
@@ -104,11 +104,11 @@ def getChargerInfo():
     """
     global duration
     global energy
-    
+
     duration += 1
-    
+
     energy += 0.5
-    
+
     tmp_charge = charge_power + random.randint(-100, 100)/10.
     return {
         "energy": str(energy),
@@ -658,7 +658,7 @@ if True:
         with open(filename) as f:
             return f.read()
     if "https-cert" in demoOpts :
-        demoOpts["https-cert"] = readfile(demoOpts["https-cert"]) 
+        demoOpts["https-cert"] = readfile(demoOpts["https-cert"])
     if "https-key" in demoOpts :
         demoOpts["https-key"] = readfile(demoOpts["https-key"])
 

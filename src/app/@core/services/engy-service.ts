@@ -1,28 +1,27 @@
 
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, delay, filter, map, switchMap, take } from 'rxjs';
+import { BehaviorSubject, Observable, combineLatest, delay, distinctUntilKeyChanged, filter, map, switchMap, take } from 'rxjs';
 import { AFBWebSocketService, IAfbResponse } from './AFB-websocket.service';
 
-export interface IChargerInfo {
-    energy: Number;
-    duration: String;
-    temp: Number;
+export enum eMeterTagSet {
+    Current,
+    Tension,
+    Power,
+    OverCurrent,
+    Energy,
+    Unset,
 }
 
-export interface IBatteryInfo {
-    chargeValue: Number;
+export interface IMeterData {
+    tag?: eMeterTagSet;
+    total: number;
+    l1: number;
+    l2: number;
+    l3: number;
 }
 
-export interface IborneStatus {
-    borneStatus: Number;
-}
-
-export interface IChargingState {
-    tag: string;
-    total: Number;
-    l1: Number;
-    l2: Number;
-    l3: Number;
+export interface MapMeterData {
+    [key: string /*eMeterTagSet*/]: IMeterData;
 }
 
 @Injectable()
@@ -30,71 +29,96 @@ export class EngyService {
 
     apiName = 'engy';
 
-    private chargerInfo: IChargerInfo = { energy: 0, duration: '??', temp: 0.0 };
-    private chargerInfoSub = new BehaviorSubject(this.chargerInfo);
-
-    private batInfo: IBatteryInfo = {chargeValue: 0};
-    private batInfoSub = new BehaviorSubject(this.batInfo);
-
+    private meterData: MapMeterData = {};
+    private engyDataSub = new BehaviorSubject(this.meterData);
 
     constructor(
         private afbService: AFBWebSocketService,
     ) {
-        // Load initial data on startup
-        // this.afbService.InitDone$.pipe(
-        //     filter(done => done),
-        //     map(() => {
-        //         return this.afbService.Send(this.apiName + '/charger-info', {});
-        //     }),
-        //     switchMap((data) => {
-        //         return data;
-        //     }),
-        //     take(1),
-        // ).subscribe((dataAfb: IAfbResponse) => {
-        //     this.chargerInfo = dataAfb.response;
-
-        //     // Update data on event in WS
-        //     this.afbService.OnEvent('*').subscribe(data => {
-        //         if (data.event === this.apiName + '/py-tux-evse-mock') {
-        //             if (data && data.data) {
-        //                 if (data.data.chargerInfo) {
-        //                 this.chargerInfo = data.data.chargerInfo;
-        //                 this.chargerInfoSub.next(this.chargerInfo);
-        //                 }
-        //                 if (data.data.batteryInfo) {
-        //                     this.batInfo = data.data.batteryInfo;
-        //                     this.batInfoSub.next(this.batInfo);
-        //                 }
-        //             }
-        //         }
-        //     });
-        // });
-
         // Now subscribe to event
         this.afbService.InitDone$.pipe(
             filter(done => done),
-            delay(500),
+            delay(500),     // TODO: understand if we really need it ?
             switchMap(() => {
-                return this.afbService.Send(this.apiName + '/subscribe', 'true');
+                return combineLatest([
+                    this.afbService.Send(this.apiName + '/tension', { 'action': 'subscribe' }),
+                    this.afbService.Send(this.apiName + '/energy', { 'action': 'subscribe' }),
+                    this.afbService.Send(this.apiName + '/current', { 'action': 'subscribe' }),
+                ]);
             })
-        ).subscribe((res: IAfbResponse) => {
-            if (res.request.code !== 0) {
-                console.error('ERROR while subscribing to event:', res);
+        ).subscribe((res: IAfbResponse[]) => {
+            if (res.length !== 3) {
+                console.error('ERROR while subscribing to event for ', this.apiName, res);
+                return;
             }
+            for (let r of res) {
+                if (r.request.status !== 'success') {
+                    console.error('ERROR while subscribing, api', this.apiName, ' res=', r);
+                }
+
+            }
+
+            //  Update data on event in WS
+            this.afbService.OnEvent('*').subscribe(data => {
+                if (data.event === this.apiName + '/tension') {
+                    if (data && data.data) {
+                        this.meterData[eMeterTagSet.Tension] = data.data;
+                        this.engyDataSub.next(this.meterData);
+                    } else {
+                        console.error('invalid tension data:', data);
+                    }
+                } else if (data.event === this.apiName + '/energy') {
+                    if (data && data.data) {
+                        this.meterData[eMeterTagSet.Energy] = data.data;
+                        this.engyDataSub.next(this.meterData);
+                    } else {
+                        console.error('invalid energy data:', data);
+                    }
+                } else if (data.event === this.apiName + '/current') {
+                    if (data && data.data) {
+                        this.meterData[eMeterTagSet.Current] = data.data;
+                        this.engyDataSub.next(this.meterData);
+                    } else {
+                        console.error('invalid current data:', data);
+                    }
+
+                } else {
+                    console.error('unknown data type:', data);
+                }
+            });
         });
     }
 
-    getTensionVolts(): Observable<IChargingState> {
-        return this.afbService.Send(this.apiName + '/tension', {'action': 'read'}).pipe(
-            map(data => data?.response),
+    getAllEngyData$(): Observable<MapMeterData> {
+        return this.engyDataSub.asObservable();
+    }
+
+    getTensionData$(): Observable<IMeterData> {
+        return this.engyDataSub.asObservable().pipe(
+            map(data => this.adjustMeter(data[eMeterTagSet.Tension])),
+            distinctUntilKeyChanged('total'),
         );
     }
 
-    getChargeInfo$(): Observable<IChargerInfo> {
-        return this.chargerInfoSub.asObservable();
+    getEnergyData$(): Observable<IMeterData> {
+        return this.engyDataSub.asObservable().pipe(
+            map(data => this.adjustMeter(data[eMeterTagSet.Energy])),
+            distinctUntilKeyChanged('total'),
+        );
     }
 
-    getBatteryInfo$(): Observable<IBatteryInfo> {
-        return this.batInfoSub.asObservable();
+    getCurrentData$(): Observable<IMeterData> {
+        return this.engyDataSub.asObservable().pipe(
+            map(data => this.adjustMeter(data[eMeterTagSet.Current])),
+            distinctUntilKeyChanged('total'),
+        );
+    }
+
+    private adjustMeter(d: IMeterData): IMeterData {
+        d.total /= 100.0;
+        d.l1 /= 100.0;
+        d.l2 /= 100.0;
+        d.l3 /= 100.0;
+        return d;
     }
 }

@@ -186,7 +186,7 @@ export class AFBWebSocketService {
     /**
      * Send data to the ws server
      */
-    // FIXME Send must return an observable 
+    // FIXME Send must return an observable
     // Send(method: string, params: object | string): Observable<IAfbResponse> {
     //     const param = this.CheckQuery(params);
     //     return <Observable<IAfbResponse>>this._isInitDone.pipe(
@@ -209,7 +209,7 @@ export class AFBWebSocketService {
     //     );
     // }
 
-    Send(method: string, params: object | string): Observable<any> {
+    Send(method: string, params: object | string | boolean): Observable<any> {
         const param = this.CheckQuery(params);
         return this._isInitDone.pipe(
             filter(done => done),
@@ -252,10 +252,11 @@ export class AFBWebSocketService {
      * @param {object | string} params - The query parameters to check and parse.
      * @return {object} - The parsed query parameters.
      */
-    CheckQuery(params: object | string) {
-        if (!params || params === undefined || (typeof params === 'string' && this.CheckIfJson(params) === false))
-            params = '{}';
-        return typeof params === 'string' ? JSON.parse(params) : params;
+    CheckQuery(params: object | string | boolean): any {
+        if (!params || params === undefined) {
+            return '{}';
+        }
+        return params;
     }
 
     /**

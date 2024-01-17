@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AFBWebSocketService } from '../@core/services/AFB-websocket.service';
-import { IBatteryInfo, EngyService } from '../@core/services/engy-service';
+import { EngyService } from '../@core/services/engy-service';
 
 
 @Component({
@@ -11,7 +11,7 @@ import { IBatteryInfo, EngyService } from '../@core/services/engy-service';
 
 export class StatusBatteryComponent implements OnInit {
 
-    battery: IBatteryInfo;
+    battery: string;
 
     /**
      * Constructs a new instance of the class.
@@ -29,9 +29,5 @@ export class StatusBatteryComponent implements OnInit {
      * @return {void}
      */
     ngOnInit() {
-        // Retrieve data from service
-        this.EngyService.getBatteryInfo$().subscribe(data => {
-            this.battery = data;
-        })
     }
 }

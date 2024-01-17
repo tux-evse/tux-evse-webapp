@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
+        "Engy",
         "evse",
         "htdocs",
         "redpesk",
@@ -10,5 +11,7 @@
     "files.exclude": {
         ".git": true,
         "*.tar.gz": true,
-    }
+    },
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true
 }
