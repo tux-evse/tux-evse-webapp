@@ -659,7 +659,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_STATION_C
 #endif
 };
 
-const lv_img_dsc_t img_station_charging = {
+const lv_img_dsc_t img_img_station_charging = {
   .header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA,
   .header.always_zero = 0,
   .header.reserved = 0,

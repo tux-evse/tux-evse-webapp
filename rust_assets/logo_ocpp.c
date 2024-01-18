@@ -195,7 +195,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_LOGO_OCPP
 #endif
 };
 
-const lv_img_dsc_t img_logo_ocpp = {
+const lv_img_dsc_t img_img_logo_ocpp = {
   .header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA,
   .header.always_zero = 0,
   .header.reserved = 0,

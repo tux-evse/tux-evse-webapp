@@ -99,7 +99,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_CURRENCY_
 #endif
 };
 
-const lv_img_dsc_t img_currency_exchange = {
+const lv_img_dsc_t img_img_currency_exchange = {
   .header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA,
   .header.always_zero = 0,
   .header.reserved = 0,
