@@ -12,7 +12,7 @@ import { Observable, Subject, map, takeUntil } from 'rxjs';
 export class ChargeInformationComponent implements OnInit, OnDestroy {
 
     readonly wattPrice = 1.5;
-    cost: string;
+    // cost: string;
     energyDelivered: number = 0;
     instantPower: number = 0;
 
@@ -38,13 +38,13 @@ export class ChargeInformationComponent implements OnInit, OnDestroy {
                 meters[eMeterTagSet.Current].total === 0) {
                 this.instantPower = 0;
                 this.energyDelivered = 0;
-                this.cost = '---';
+                // this.cost = '---';
                 return
             }
 
             this.instantPower = meters[eMeterTagSet.Power].l1;
             this.energyDelivered = meters[eMeterTagSet.Tension].total * meters[eMeterTagSet.Tension].total;
-            this.cost = (this.energyDelivered * this.wattPrice).toFixed(3);
+            // this.cost = (this.energyDelivered * this.wattPrice).toFixed(3);
         });
     }
 

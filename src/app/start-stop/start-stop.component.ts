@@ -6,5 +6,10 @@ import { Component } from '@angular/core';
   styleUrls: ['./start-stop.component.scss']
 })
 export class StartStopComponent {
+  btnDisabled: boolean = true;
 
+  onStop() {
+    alert('STOPPED !!!');
+    this.btnDisabled = false;
+  }
 }

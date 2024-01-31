@@ -70,7 +70,6 @@ export class ChMgrService {
     private isoStateSub = new BehaviorSubject(this.chargingState.iso);
     private authStateSub = new BehaviorSubject(this.chargingState.auth);
 
-
     constructor(
         private afbService: AFBWebSocketService,
     ) {

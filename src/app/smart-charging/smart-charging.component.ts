@@ -6,10 +6,22 @@ import { Component } from '@angular/core';
   styleUrls: ['./smart-charging.component.scss']
 })
 export class SmartChargingComponent {
-  ocppChecked: boolean = true;
-  iso15118Checked: boolean = false;
-  pncChecked: boolean = false;
-  v2gChecked: boolean = false;
-  badgeChecked: boolean = true;
-}
 
+  smartList = [
+    {
+      name: 'OCPP', checked: false
+    },
+    {
+      name: 'ISO 15118', checked: false
+    },
+    {
+      name: 'PnC', checked: false
+    },
+    {
+      name: 'V2G', checked: false
+    },
+    {
+      name: 'IEC', checked: false
+    }
+  ];
+}
