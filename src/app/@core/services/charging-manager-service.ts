@@ -1,7 +1,14 @@
-
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest, delay, filter, map, switchMap, take } from 'rxjs';
 import { AFBWebSocketService, IAfbResponse } from './AFB-websocket.service';
+
+export enum eReservationState {
+    Accepted = 'accepted',
+    Refused = 'refused',
+    Pending = 'pending',
+    Cancel = 'cancel',
+    Request = 'request',
+}
 
 export enum ePlugState {
     PlugIn = 'plugin',
@@ -34,20 +41,22 @@ export enum eAuthMsg {
 }
 
 export interface IChargingState {
+    updated: boolean;
     imax?: Number;
     pmax?: Number;
     plugged: ePlugState;
     power: ePowerRequest;
     iso: eIsoState;
     auth: eAuthMsg;
+    reservation: eReservationState;
 }
 
 export interface IChargingMsg {
-    Plugged?: ePlugState,
-    Power?: ePowerRequest,
-    Iso?: eIsoState,
-    Auth?: eAuthMsg,
-    State?: IChargingState,
+    plugged?: ePlugState,
+    power?: ePowerRequest,
+    iso?: eIsoState,
+    auth?: eAuthMsg,
+    state?: IChargingState,
 }
 
 
@@ -57,12 +66,14 @@ export class ChMgrService {
     apiName = 'chmgr';
 
     private chargingState: IChargingState = {
+        updated: false,
         imax: 0,
         pmax: 0,
         plugged: ePlugState.Unknown,
         power: ePowerRequest.Unknown,
         iso: eIsoState.Unset,
         auth: eAuthMsg.Unknown,
+        reservation: eReservationState.Pending
     };
     private chargingStateSub = new BehaviorSubject(this.chargingState);
     private plugStateSub = new BehaviorSubject(this.chargingState.plugged);
@@ -76,7 +87,7 @@ export class ChMgrService {
         // Now subscribe to event
         this.afbService.InitDone$.pipe(
             filter(done => done),
-            delay(500),     // TODO: understand if we really need it ?
+            // delay(1000),     // TODO: understand if we really need it ?
             switchMap(() => {
                 return combineLatest([
                     this.afbService.Send(this.apiName + '/state', { 'action': 'subscribe' }),
@@ -104,28 +115,28 @@ export class ChMgrService {
                     if (data && data.data) {
                         const cm = <IChargingMsg>data.data;
 
-                        if (cm.Power) {
-                            this.chargingState.power = cm.Power;
+                        if (cm.power) {
+                            this.chargingState.power = cm.power;
                             this.powerStateSub.next(this.chargingState.power);
                             this.chargingStateSub.next(this.chargingState);
 
-                        } else if (cm.Auth) {
-                            this.chargingState.auth = cm.Auth;
+                        } else if (cm.auth) {
+                            this.chargingState.auth = cm.auth;
                             this.authStateSub.next(this.chargingState.auth);
                             this.chargingStateSub.next(this.chargingState);
 
-                        } else if (cm.Iso) {
-                            this.chargingState.iso = cm.Iso;
+                        } else if (cm.iso) {
+                            this.chargingState.iso = cm.iso;
                             this.isoStateSub.next(this.chargingState.iso);
                             this.chargingStateSub.next(this.chargingState);
 
-                        } else if (cm.Plugged) {
-                            this.chargingState.plugged = cm.Plugged;
+                        } else if (cm.plugged) {
+                            this.chargingState.plugged = cm.plugged;
                             this.plugStateSub.next(this.chargingState.plugged);
                             this.chargingStateSub.next(this.chargingState);
 
-                        } else if (cm.State) {
-                            this.chargingState = cm.State;
+                        } else if (cm.state) {
+                            this.chargingState = cm.state;
                             this.chargingStateSub.next(this.chargingState);
 
                         } else {
@@ -133,7 +144,7 @@ export class ChMgrService {
                         }
                     }
                 } else {
-                    console.error('Unknown event api name:', data);
+                    // console.error('Unknown event api name:', data);
                 }
             });
         });

@@ -4,12 +4,12 @@ import { BehaviorSubject, Observable, combineLatest, delay, distinctUntilKeyChan
 import { AFBWebSocketService, IAfbResponse } from './AFB-websocket.service';
 
 export enum eMeterTagSet {
-    Current,
-    Tension,
-    Power,
-    OverCurrent,
-    Energy,
-    Unset,
+    Current = 'current',
+    Tension = 'tension',
+    Power = 'power',
+    OverCurrent = 'overcurrent',
+    Energy = 'energy',
+    Unset = 'unset',
 }
 
 export interface IMeterData {
@@ -29,7 +29,14 @@ export class EngyService {
 
     apiName = 'engy';
 
-    private meterData: MapMeterData = {};
+    private meterData: MapMeterData = {
+        [eMeterTagSet.Current]: { total: 0, l1: 0, l2: 0, l3: 0 },
+        [eMeterTagSet.Tension]: { total: 0, l1: 0, l2: 0, l3: 0 },
+        [eMeterTagSet.Power]: { total: 0, l1: 0, l2: 0, l3: 0 },
+        [eMeterTagSet.OverCurrent]: { total: 0, l1: 0, l2: 0, l3: 0 },
+        [eMeterTagSet.Energy]: { total: 0, l1: 0, l2: 0, l3: 0 },
+        [eMeterTagSet.Unset]: { total: 0, l1: 0, l2: 0, l3: 0 },
+    };
     private engyDataSub = new BehaviorSubject(this.meterData);
 
     constructor(
@@ -38,7 +45,7 @@ export class EngyService {
         // Now subscribe to event
         this.afbService.InitDone$.pipe(
             filter(done => done),
-            delay(500),     // TODO: understand if we really need it ?
+            // delay(1000),     // TODO: understand if we really need it ?
             switchMap(() => {
                 return combineLatest([
                     this.afbService.Send(this.apiName + '/tension', { 'action': 'subscribe' }),
@@ -83,9 +90,14 @@ export class EngyService {
                     }
 
                 } else {
-                    console.error('unknown data type:', data);
+                    // console.error('unknown data type:', data);
                 }
             });
+
+
+            this.getAllEngyData$().subscribe(data => {
+                console.log('SEB getAllEngyData$', data);
+            })
         });
     }
 
@@ -95,13 +107,19 @@ export class EngyService {
 
     getTensionData$(): Observable<IMeterData> {
         return this.engyDataSub.asObservable().pipe(
-            map(data => this.adjustMeter(data[eMeterTagSet.Tension])),
+            // filter(data => eMeterTagSet.Tension in data),
+            map(data => {
+                const x = this.adjustMeter(data[eMeterTagSet.Tension]);
+                console.log('SEB getCurrentData$ map tension', x);
+                return x;
+            }),
             distinctUntilKeyChanged('total'),
         );
     }
 
     getEnergyData$(): Observable<IMeterData> {
         return this.engyDataSub.asObservable().pipe(
+            // filter(data => eMeterTagSet.Energy in data),
             map(data => this.adjustMeter(data[eMeterTagSet.Energy])),
             distinctUntilKeyChanged('total'),
         );
@@ -109,16 +127,30 @@ export class EngyService {
 
     getCurrentData$(): Observable<IMeterData> {
         return this.engyDataSub.asObservable().pipe(
-            map(data => this.adjustMeter(data[eMeterTagSet.Current])),
+            // filter(data => eMeterTagSet.Current in data),
+            map(data => {
+                const x = this.adjustMeter(data[eMeterTagSet.Current]);
+                console.log('SEB getCurrentData$ map current', x);
+                return x;
+            }),
             distinctUntilKeyChanged('total'),
         );
     }
 
+    // private adjustMeter(d: IMeterData): IMeterData {
+    //     d.total /= 100.0;
+    //     d.l1 /= 100.0;
+    //     d.l2 /= 100.0;
+    //     d.l3 /= 100.0;
+    //     return d;
+    // }
     private adjustMeter(d: IMeterData): IMeterData {
-        d.total /= 100.0;
-        d.l1 /= 100.0;
-        d.l2 /= 100.0;
-        d.l3 /= 100.0;
-        return d;
+        const factor = 100.0;
+        return {
+            total: d.total / factor,
+            l1: d.l1 / factor,
+            l2: d.l2 / factor,
+            l3: d.l3 / factor,
+        };
     }
 }

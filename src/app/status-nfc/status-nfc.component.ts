@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ChMgrService, eAuthMsg } from '../@core/services/charging-manager-service';
 
 @Component({
@@ -6,7 +6,8 @@ import { ChMgrService, eAuthMsg } from '../@core/services/charging-manager-servi
   templateUrl: './status-nfc.component.html',
   styleUrls: ['./status-nfc.component.scss']
 })
-export class StatusNfcComponent {
+
+export class StatusNfcComponent implements OnInit {
   // selectedCase: number = 3; // Change this variable to select the case
 
   // cases: { [key: number]: string } = {
@@ -19,7 +20,7 @@ export class StatusNfcComponent {
 
     nfcText = new Map<eAuthMsg, string>([
         [eAuthMsg.Done, "<span class='on'>Done</span>"],
-        [eAuthMsg.Fail, "<span class='on'>Fail</span><"],
+        [eAuthMsg.Fail, "<span class='on'>Fail</span>"],
         [eAuthMsg.Pending, "<span class='intermediate'>Pending"],
         [eAuthMsg.Idle, "<span class='idle'>Idle</span>"],
         [eAuthMsg.Unknown, "<span class='error'>Unknown</span>"]

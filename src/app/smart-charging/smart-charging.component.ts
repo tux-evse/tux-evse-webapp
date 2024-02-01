@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ChMgrService, eIsoState } from '../@core/services/charging-manager-service';
 
 @Component({
   selector: 'app-smart-charging',
@@ -6,6 +7,8 @@ import { Component } from '@angular/core';
   styleUrls: ['./smart-charging.component.scss']
 })
 export class SmartChargingComponent {
+
+  smartStatus: eIsoState = eIsoState.Unset;
 
   smartList = [
     {
@@ -24,4 +27,26 @@ export class SmartChargingComponent {
       name: 'IEC', checked: false
     }
   ];
+
+  constructor(private chMgrService: ChMgrService) {
+  //   this.chMgrService.getIsoState$().subscribe(state => {
+  //     this.smartStatus = state;
+  //   });
+  }
+
+  ngOnInit() {
+    this.chMgrService.getIsoState$().subscribe(state => {
+      this.smartStatus = state;
+    });
+
+    this.chMgrService.getIsoState$().subscribe(state => console.log('SEB in smart state component: state=', state));
+  }
+
+  changeSmartList(smart: string) {
+    this.smartList.forEach(s => {
+      if (s.name === smart) {
+        s.checked = !s.checked;
+      }
+    });
+  }
 }

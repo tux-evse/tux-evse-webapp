@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { EngyService, IMeterData, MapMeterData, eMeterTagSet } from '../@core/services/engy-service';
-import { Observable, Subject, map, takeUntil } from 'rxjs';
+import { Observable, Subject, map, takeUntil, tap } from 'rxjs';
 
 
 @Component({
@@ -11,7 +11,7 @@ import { Observable, Subject, map, takeUntil } from 'rxjs';
 
 export class ChargeInformationComponent implements OnInit, OnDestroy {
 
-    readonly wattPrice = 1.5;
+    // readonly wattPrice = 1.5;
     // cost: string;
     energyDelivered: number = 0;
     instantPower: number = 0;
@@ -26,10 +26,13 @@ export class ChargeInformationComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.chargerCurrent$ = this.EngyService.getCurrentData$().pipe(
+            tap(d =>console.log('SEB this.chargerCurrent$ tap', d)),
             takeUntil(this.destroy$),
         );
 
-        this.chargerCurrent$.subscribe(d => console.log('SEB this.chargerCurrent$=', d))
+        this.chargerCurrent$.subscribe(d => {
+            console.log('SEB this.chargerCurrent$=', d);
+        })
 
         this.EngyService.getAllEngyData$().pipe(
             takeUntil(this.destroy$),

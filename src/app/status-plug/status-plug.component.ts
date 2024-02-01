@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ChMgrService, ePlugState } from '../@core/services/charging-manager-service';
 
 @Component({
@@ -6,7 +6,7 @@ import { ChMgrService, ePlugState } from '../@core/services/charging-manager-ser
     templateUrl: './status-plug.component.html',
     styleUrls: ['./status-plug.component.scss']
 })
-export class StatusPlugComponent {
+export class StatusPlugComponent implements OnInit {
     plugStatus: ePlugState = ePlugState.Unknown; // Change this variable to select the case
 
     plugText = new Map<ePlugState, string>([
