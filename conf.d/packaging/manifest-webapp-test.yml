@@ -1,0 +1,29 @@
+rp-manifest: 1
+
+id: tux-evse-webapp
+version: 1.0
+name: tux-evse-webapp
+description: WebApp to display Tux-EVSE data
+author: IoT.bzh team <team@iot.bzh>
+license: GPL
+targets:
+  - target: main
+    content:
+      src: bin/tux-evse-webapp-start.sh
+      type: application/x-executable
+    provided-api:
+      - name: tux-evse
+        value: ws
+file-properties:
+  - name: htdocs/favicon.ico
+    value: public
+  - name: htdocs/index.html
+    value: public
+  - name: htdocs/main.js
+    value: public
+  - name: htdocs/polyfills.js
+    value: public
+  - name: htdocs/runtime.js
+    value: public
+  - name: htdocs/styles.css
+    value: public
