@@ -1,0 +1,10 @@
+{
+  "monitoring": true,
+  "auto-api": [
+    "/tmp/api"
+  ],
+  "port": 1239,
+  "alias": [
+    "/monitoring:/usr/share/afb-binder/monitoring"
+  ]
+}
