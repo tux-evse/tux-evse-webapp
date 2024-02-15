@@ -22,6 +22,7 @@ import { StatusNfcComponent } from './status-nfc/status-nfc.component';
 import { FooterComponent } from './footer/footer.component';
 import { AuthService } from './@core/services/auth-service';
 import { ChMgrService } from './@core/services/charging-manager-service';
+import { DbusService } from './@core/services/dbus-service';
 
 @NgModule({
   declarations: [
@@ -51,6 +52,7 @@ import { ChMgrService } from './@core/services/charging-manager-service';
     EngyService,
     AuthService,
     ChMgrService,
+    DbusService,
 ],
   bootstrap: [AppComponent]
 })

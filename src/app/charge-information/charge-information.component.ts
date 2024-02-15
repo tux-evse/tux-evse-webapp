@@ -10,11 +10,10 @@ import { Observable, Subject, map, takeUntil, tap } from 'rxjs';
 })
 
 export class ChargeInformationComponent implements OnInit, OnDestroy {
-
-    // readonly wattPrice = 1.5;
-    // cost: string;
     energyDelivered: number = 0;
     instantPower: number = 0;
+    currentCharge: number = 0;
+    powerCharge: number = 0;
 
     chargerCurrent$: Observable<IMeterData>;
 
@@ -39,15 +38,13 @@ export class ChargeInformationComponent implements OnInit, OnDestroy {
         ).subscribe((meters: MapMeterData) => {
             if (meters[eMeterTagSet.Tension].total === 0 ||
                 meters[eMeterTagSet.Current].total === 0) {
-                this.instantPower = 0;
-                this.energyDelivered = 0;
-                // this.cost = '---';
+                this.instantPower = 1;
+                this.energyDelivered = 1;
                 return
             }
 
             this.instantPower = meters[eMeterTagSet.Power].l1;
             this.energyDelivered = meters[eMeterTagSet.Tension].total * meters[eMeterTagSet.Tension].total;
-            // this.cost = (this.energyDelivered * this.wattPrice).toFixed(3);
         });
     }
 

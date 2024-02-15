@@ -21,6 +21,7 @@ export enum ePlugState {
 export enum ePowerRequest {
     Start = 'start',
     Charging = 'charging',
+    Idle = 'idle',
     Stop = 0,
     Unknown = 'unknown',
 }
@@ -33,22 +34,22 @@ export enum eIsoState {
 }
 
 export enum eAuthMsg {
-    Done,
-    Fail,
-    Pending,
-    Idle,
-    Unknown,
+    Done = 'done',
+    Fail = 'fail',
+    Pending = 'pending',
+    Idle = 'idle',
+    Unknown = 'unknown',
 }
 
 export interface IChargingState {
-    updated: boolean;
+    updated?: boolean;
     imax?: Number;
     pmax?: Number;
     plugged: ePlugState;
     power: ePowerRequest;
     iso: eIsoState;
     auth: eAuthMsg;
-    reservation: eReservationState;
+    reservation?: eReservationState;
 }
 
 export interface IChargingMsg {
@@ -80,6 +81,8 @@ export class ChMgrService {
     private powerStateSub = new BehaviorSubject(this.chargingState.power);
     private isoStateSub = new BehaviorSubject(this.chargingState.iso);
     private authStateSub = new BehaviorSubject(this.chargingState.auth);
+
+    private StateSub$ = new BehaviorSubject(this.chargingState);
 
     constructor(
         private afbService: AFBWebSocketService,
@@ -114,34 +117,38 @@ export class ChMgrService {
                 if (data.event === this.apiName + '/state') {
                     if (data && data.data) {
                         const cm = <IChargingMsg>data.data;
+                        console.log('SLY chmgrservice = ', data);
 
-                        if (cm.power) {
-                            this.chargingState.power = cm.power;
+                        // if (cm.power) {
+                        //     // console.log('SEB getChargingState$ plugged', cm);
+                            this.chargingState = <IChargingState>{auth: cm.auth,iso: cm.iso,plugged: cm.plugged,power: cm.power};
+
+                            // this.StateSub$.next(this.chargingState);
+
                             this.powerStateSub.next(this.chargingState.power);
-                            this.chargingStateSub.next(this.chargingState);
 
-                        } else if (cm.auth) {
-                            this.chargingState.auth = cm.auth;
+                        // } else if (cm.auth) {
+                        //     console.log('SEB getChargingState$ plugged', cm);
+                        //     this.chargingState.auth = cm.auth;
                             this.authStateSub.next(this.chargingState.auth);
-                            this.chargingStateSub.next(this.chargingState);
 
-                        } else if (cm.iso) {
-                            this.chargingState.iso = cm.iso;
+                        // } else if (cm.iso) {
+                        //     this.chargingState.iso = cm.iso;
                             this.isoStateSub.next(this.chargingState.iso);
-                            this.chargingStateSub.next(this.chargingState);
 
-                        } else if (cm.plugged) {
-                            this.chargingState.plugged = cm.plugged;
+                        // } else if (cm.plugged) {
+                            // this.chargingState.plugged = <ePlugState>cm.plugged;
                             this.plugStateSub.next(this.chargingState.plugged);
+
                             this.chargingStateSub.next(this.chargingState);
 
-                        } else if (cm.state) {
-                            this.chargingState = cm.state;
-                            this.chargingStateSub.next(this.chargingState);
+                        // } else if (cm.state) {
+                        //     this.chargingState = cm.state;
+                            // this.chargingStateSub.next(this.chargingState);
 
-                        } else {
-                            console.error('Unknown event state type:', data);
-                        }
+                        // } else {
+                        //     console.error('Unknown event state type:', data);
+                        // }
                     }
                 } else {
                     // console.error('Unknown event api name:', data);
