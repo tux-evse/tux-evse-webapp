@@ -19,6 +19,8 @@ targets:
         value: auto
       - name: auth
         value: auto
+      - name: dbus
+        value: auto
 
     required-config:
       - etc/tux-evse-webapp.json
@@ -29,6 +31,7 @@ targets:
       - acl:engy
       - acl:auth
       - acl:chmgr
+      - acl:dbus
 
 file-properties:
   - name: htdocs/favicon.ico
