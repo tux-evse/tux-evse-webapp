@@ -14,6 +14,6 @@ echo tux-evse-webapp debug mode config=$CONFDIR/*.json
 
 /usr/bin/afb-binder \
   --config=$CONFDIR/tux-evse-webapp-binder.json \
-  --config=$CONFDIR/../../tux-evse-webapp.json \
-  --config=$CONFDIR/../../tux-evse-webapp-debug.yml \
+  --config=$CONFDIR/../../etc/tux-evse-webapp.json \
+  --config=$CONFDIR/../../etc/tux-evse-webapp-debug.json \
   $*
