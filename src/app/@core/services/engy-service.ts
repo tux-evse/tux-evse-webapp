@@ -65,11 +65,18 @@ export class EngyService {
 
             }
 
+            this.getAllEngyData$().subscribe(
+                data => {
+                console.log('SEB getAllEngyData$', data);
+            }
+            )
+
             //  Update data on event in WS
-            this.afbService.OnEvent('*').subscribe(data => {
+            this.afbService.OnEvent('/tension').subscribe(data => {
                 if (data.event === this.apiName + '/tension') {
                     if (data && data.data) {
                         this.meterData[eMeterTagSet.Tension] = data.data;
+                        console.log('ADELA', this.meterData);
                         this.engyDataSub.next(this.meterData);
                     } else {
                         console.error('invalid tension data:', data);
@@ -95,9 +102,9 @@ export class EngyService {
             });
 
 
-            this.getAllEngyData$().subscribe(data => {
-                console.log('SEB getAllEngyData$', data);
-            })
+            // this.getAllEngyData$().subscribe(data => {
+            //     console.log('SEB getAllEngyData$', data);
+            // })
         });
     }
 
@@ -110,7 +117,7 @@ export class EngyService {
             // filter(data => eMeterTagSet.Tension in data),
             map(data => {
                 const x = this.adjustMeter(data[eMeterTagSet.Tension]);
-                console.log('SEB getCurrentData$ map tension', x);
+                // console.log('SEB getCurrentData$ map tension', x);
                 return x;
             }),
             distinctUntilKeyChanged('total'),
@@ -130,7 +137,7 @@ export class EngyService {
             // filter(data => eMeterTagSet.Current in data),
             map(data => {
                 const x = this.adjustMeter(data[eMeterTagSet.Current]);
-                console.log('SEB getCurrentData$ map current', x);
+                // console.log('SEB getCurrentData$ map current', x);
                 return x;
             }),
             distinctUntilKeyChanged('total'),
@@ -145,6 +152,7 @@ export class EngyService {
     //     return d;
     // }
     private adjustMeter(d: IMeterData): IMeterData {
+        console.log('SYLVAIIIIIIIIIIIN', d);
         const factor = 100.0;
         return {
             total: d.total / factor,

@@ -1,28 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ChMgrService, ePowerRequest } from '../@core/services/charging-manager-service';
 
 @Component({
   selector: 'app-borne-information',
   templateUrl: './borne-information.component.html',
   styleUrls: ['./borne-information.component.scss']
 })
-export class BorneInformationComponent {
-  selectedCase: number = 1; // Change this variable to select the case
+export class BorneInformationComponent implements OnInit {
+  stationStatus: ePowerRequest = ePowerRequest.Unknown;
 
-  cases: { [key: number]: string } = {
-    1: "<span class='available'>Available</span>",
-    2: "<span class='reserved'>Reserved</span>",
-    3: "<span class='pending-autho'>Pending autho</span>",
-    4: "<span class='charging'>Charging</span>",
-    5: "<span class='completed'>Completed</span>",
-    6: "<span class='out-of-order'>Out of</br>order</span>"
-  };
+  stationText = new Map<ePowerRequest, string>([
+    [ePowerRequest.Charging, "<span class='charging'>Charging</span>"],
+    [ePowerRequest.Start, "<span class='available'>Available</span>"],
+    [ePowerRequest.Stop, "<span class='out-of-order'>Out of</br>order</span>"],
+    [ePowerRequest.Idle, "<span class='intermediate'>Idle</span>"],
+    [ePowerRequest.Unknown, "<span class='error'>Unknown</span>"]
+  ])
 
-  classMappings: {[key: number]: string} = {
-    1: 'available',
-    2: 'reserved',
-    3: 'pending-autho',
-    4: 'charging',
-    5: 'completed',
-    6: 'out-of-order'
-  };
+  classMappings = new Map<ePowerRequest, string>([
+    [ePowerRequest.Charging, 'charging'],
+    [ePowerRequest.Start, 'available'],
+    [ePowerRequest.Stop, 'out-of-order'],
+    [ePowerRequest.Idle, 'intermediate'],
+    [ePowerRequest.Unknown, 'out-of-order']
+  ])
+
+  constructor(
+    private ChMgrService: ChMgrService,
+  ) { }
+
+  ngOnInit(): void {
+    this.ChMgrService.getPowerState$().subscribe(s => this.stationStatus = s);
+    this.ChMgrService.getPowerState$().subscribe(s => console.log('SEB in station state component: state=', s));
+  }
 }

@@ -7,5 +7,6 @@ DEBUG_OPTS=--tracereq=all
     --ws-client=tcp:$PHYTEC_REMOTE_BOARD_NAME:12351/engy \
     --ws-client=tcp:$PHYTEC_REMOTE_BOARD_NAME:12371/chmgr \
     --ws-client=tcp:$PHYTEC_REMOTE_BOARD_NAME:12381/auth \
+    --ws-client=tcp:$PHYTEC_REMOTE_BOARD_NAME:1234/dbus \
     $DEBUG_OPTS \
     --roothttp=./dist/valeo

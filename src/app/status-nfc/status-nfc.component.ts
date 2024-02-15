@@ -20,7 +20,7 @@ export class StatusNfcComponent implements OnInit {
 
     nfcText = new Map<eAuthMsg, string>([
         [eAuthMsg.Done, "<span class='on'>Done</span>"],
-        [eAuthMsg.Fail, "<span class='on'>Fail</span>"],
+        [eAuthMsg.Fail, "<span class='error'>Fail</span>"],
         [eAuthMsg.Pending, "<span class='intermediate'>Pending"],
         [eAuthMsg.Idle, "<span class='idle'>Idle</span>"],
         [eAuthMsg.Unknown, "<span class='error'>Unknown</span>"]
