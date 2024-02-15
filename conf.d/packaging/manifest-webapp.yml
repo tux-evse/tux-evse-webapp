@@ -9,11 +9,27 @@ license: GPL
 targets:
   - target: main
     content:
-      src: bin/tux-evse-webapp-start.sh
-      type: application/x-executable
-    provided-api:
-      - name: tux-evse
-        value: ws
+      src: etc/tux-evse-webapp.json
+      type: application/vnd.agl.service
+
+    required-api:
+      - name: engy
+        value: auto
+      - name: chmgr
+        value: auto
+      - name: auth
+        value: auto
+
+    required-config:
+      - etc/tux-evse-webapp.json
+      - etc/tux-evse-webapp-debug.json
+
+    required-permission:
+      - urn:AGL:permission::system:run-by-default
+      - acl:engy
+      - acl:auth
+      - acl:chmgr
+
 file-properties:
   - name: htdocs/favicon.ico
     value: public
