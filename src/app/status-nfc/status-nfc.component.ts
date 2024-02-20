@@ -8,15 +8,8 @@ import { ChMgrService, eAuthMsg } from '../@core/services/charging-manager-servi
 })
 
 export class StatusNfcComponent implements OnInit {
-  // selectedCase: number = 3; // Change this variable to select the case
 
-  // cases: { [key: number]: string } = {
-  //   1: "<span class=''>Please place your badge</br>in the NFC area below</span>",
-  //   2: "<span class='on'><b>Badge accepted</b></span>",
-  //   3: "<span class='error'><b>Badge unknown</b></span>"
-  // };
-
-  nfcStatus: eAuthMsg = eAuthMsg.Unknown; // Change this variable to select the case
+    nfcStatus: eAuthMsg = eAuthMsg.Unknown; // Change this variable to select the case
 
     nfcText = new Map<eAuthMsg, string>([
         [eAuthMsg.Done, "<span class='on'>Done</span>"],
@@ -42,6 +35,6 @@ export class StatusNfcComponent implements OnInit {
     ngOnInit() {
         this.ChMgrService.getAuthState$().subscribe(s => this.nfcStatus = s);
 
-        this.ChMgrService.getAuthState$().subscribe(s => console.log('SEB in nfc state component: state=', s));
+        // this.ChMgrService.getAuthState$().subscribe(s => console.log('SLY in nfc state component: state=', s));
     }
 }

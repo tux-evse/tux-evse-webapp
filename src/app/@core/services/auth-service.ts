@@ -1,4 +1,3 @@
-
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, delay, filter, map, switchMap, take } from 'rxjs';
 import { AFBWebSocketService, IAfbResponse } from './AFB-websocket.service';
@@ -11,7 +10,7 @@ export class AuthService {
 
 
     constructor(
-        private afbService: AFBWebSocketService,
+        private afbService: AFBWebSocketService,    
     ) {
         // // Load initial data on startup
         // this.afbService.InitDone$.pipe(

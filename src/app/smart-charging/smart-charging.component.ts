@@ -39,7 +39,7 @@ export class SmartChargingComponent {
       this.smartStatus = state;
     });
 
-    this.chMgrService.getIsoState$().subscribe(state => console.log('SEB in smart state component: state=', state));
+    this.chMgrService.getIsoState$().subscribe(state => console.log('SLY in smart state component: state=', state));
   }
 
   changeSmartList(smart: string) {

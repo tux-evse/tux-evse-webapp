@@ -33,7 +33,7 @@ export class StatusPlugComponent implements OnInit {
     ngOnInit() {
         this.ChMgrService.getPlugState$().subscribe(s => this.plugStatus = s);
 
-        this.ChMgrService.getPlugState$().subscribe(s => console.log('SEB in plug state component: state=', s));
+        // this.ChMgrService.getPlugState$().subscribe(s => console.log('SLY in plug state component: state=', s));
     }
 
 }
