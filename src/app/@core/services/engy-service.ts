@@ -1,4 +1,3 @@
-
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest, delay, distinctUntilKeyChanged, filter, map, switchMap, take } from 'rxjs';
 import { AFBWebSocketService, IAfbResponse } from './AFB-websocket.service';
@@ -65,46 +64,27 @@ export class EngyService {
 
             }
 
-            this.getAllEngyData$().subscribe(
-                data => {
-                console.log('SEB getAllEngyData$', data);
-            }
-            )
+            // this.getAllEngyData$().subscribe(
+            //     data => {
+            //     console.log('SLY getAllEngyData$', data);
+            // }
+            // )
 
             //  Update data on event in WS
-            this.afbService.OnEvent('/tension').subscribe(data => {
-                if (data.event === this.apiName + '/tension') {
-                    if (data && data.data) {
-                        this.meterData[eMeterTagSet.Tension] = data.data;
-                        console.log('ADELA', this.meterData);
-                        this.engyDataSub.next(this.meterData);
-                    } else {
-                        console.error('invalid tension data:', data);
-                    }
-                } else if (data.event === this.apiName + '/energy') {
-                    if (data && data.data) {
-                        this.meterData[eMeterTagSet.Energy] = data.data;
-                        this.engyDataSub.next(this.meterData);
-                    } else {
-                        console.error('invalid energy data:', data);
-                    }
-                } else if (data.event === this.apiName + '/current') {
-                    if (data && data.data) {
-                        this.meterData[eMeterTagSet.Current] = data.data;
-                        this.engyDataSub.next(this.meterData);
-                    } else {
-                        console.error('invalid current data:', data);
-                    }
-
+            this.afbService.OnEvent('engy/tension').subscribe(data => {
+                if (data && data.data) {
+                    this.meterData[eMeterTagSet.Tension] = data.data;
+                    // console.log('SLY', data.data);
+                    this.engyDataSub.next(this.meterData);
                 } else {
-                    // console.error('unknown data type:', data);
+                    console.error('invalid tension data:', data);
                 }
             });
 
 
-            // this.getAllEngyData$().subscribe(data => {
-            //     console.log('SEB getAllEngyData$', data);
-            // })
+            this.getAllEngyData$().subscribe(data => {
+                // console.log('SLY getAllEngyData$', data);
+            })
         });
     }
 
@@ -117,7 +97,7 @@ export class EngyService {
             // filter(data => eMeterTagSet.Tension in data),
             map(data => {
                 const x = this.adjustMeter(data[eMeterTagSet.Tension]);
-                // console.log('SEB getCurrentData$ map tension', x);
+                // console.log('SLY getCurrentData$ map tension', x);
                 return x;
             }),
             distinctUntilKeyChanged('total'),
@@ -137,28 +117,29 @@ export class EngyService {
             // filter(data => eMeterTagSet.Current in data),
             map(data => {
                 const x = this.adjustMeter(data[eMeterTagSet.Current]);
-                // console.log('SEB getCurrentData$ map current', x);
+                // console.log('SLY getCurrentData$ map current', data);
                 return x;
             }),
             distinctUntilKeyChanged('total'),
         );
     }
 
-    // private adjustMeter(d: IMeterData): IMeterData {
-    //     d.total /= 100.0;
-    //     d.l1 /= 100.0;
-    //     d.l2 /= 100.0;
-    //     d.l3 /= 100.0;
-    //     return d;
-    // }
     private adjustMeter(d: IMeterData): IMeterData {
+        d.total /= 100.0;
+        d.l1 /= 100.0;
+        d.l2 /= 100.0;
+        d.l3 /= 100.0;
         console.log('SYLVAIIIIIIIIIIIN', d);
-        const factor = 100.0;
-        return {
-            total: d.total / factor,
-            l1: d.l1 / factor,
-            l2: d.l2 / factor,
-            l3: d.l3 / factor,
-        };
+        return d;
     }
+    // private adjustMeter(d: IMeterData): IMeterData {
+    //     console.log('SYLVAIIIIIIIIIIIN', d);
+    //     const factor = 100.0;
+    //     return {
+    //         total: d.total / factor,
+    //         l1: d.l1 / factor,
+    //         l2: d.l2 / factor,
+    //         l3: d.l3 / factor,
+    //     };
+    // }
 }

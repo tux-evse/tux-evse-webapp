@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest, delay, filter, map, switchMap, take } from 'rxjs';
 import { AFBWebSocketService, IAfbResponse } from './AFB-websocket.service';
 
-export enum eReservationState {
-    Accepted = 'accepted',
-    Refused = 'refused',
-    Pending = 'pending',
-    Cancel = 'cancel',
-    Request = 'request',
-}
+// export enum eReservationState {
+//     Accepted = 'accepted',
+//     Refused = 'refused',
+//     Pending = 'pending',
+//     Cancel = 'cancel',
+//     Request = 'request',
+// }
 
 export enum ePlugState {
     PlugIn = 'plugin',
@@ -27,10 +27,11 @@ export enum ePowerRequest {
 }
 
 export enum eIsoState {
-    Iso20,
-    Iso2,
-    Iec,
-    Unset,
+    Iso20 = 'iso20',
+    Iso2 = 'iso2',
+    Iso3 = 'iso3',
+    Iec = 'iec',
+    Unset = 'unset',
 }
 
 export enum eAuthMsg {
@@ -49,7 +50,7 @@ export interface IChargingState {
     power: ePowerRequest;
     iso: eIsoState;
     auth: eAuthMsg;
-    reservation?: eReservationState;
+    // reservation?: eReservationState;
 }
 
 export interface IChargingMsg {
@@ -74,7 +75,7 @@ export class ChMgrService {
         power: ePowerRequest.Unknown,
         iso: eIsoState.Unset,
         auth: eAuthMsg.Unknown,
-        reservation: eReservationState.Pending
+        // reservation: eReservationState.Pending
     };
     private chargingStateSub = new BehaviorSubject(this.chargingState);
     private plugStateSub = new BehaviorSubject(this.chargingState.plugged);
@@ -117,38 +118,20 @@ export class ChMgrService {
                 if (data.event === this.apiName + '/state') {
                     if (data && data.data) {
                         const cm = <IChargingMsg>data.data;
-                        console.log('SLY chmgrservice = ', data);
+                        // console.log('SLY chmgrservice = ', data);
 
-                        // if (cm.power) {
-                        //     // console.log('SEB getChargingState$ plugged', cm);
                             this.chargingState = <IChargingState>{auth: cm.auth,iso: cm.iso,plugged: cm.plugged,power: cm.power};
 
-                            // this.StateSub$.next(this.chargingState);
 
                             this.powerStateSub.next(this.chargingState.power);
 
-                        // } else if (cm.auth) {
-                        //     console.log('SEB getChargingState$ plugged', cm);
-                        //     this.chargingState.auth = cm.auth;
                             this.authStateSub.next(this.chargingState.auth);
 
-                        // } else if (cm.iso) {
-                        //     this.chargingState.iso = cm.iso;
                             this.isoStateSub.next(this.chargingState.iso);
 
-                        // } else if (cm.plugged) {
-                            // this.chargingState.plugged = <ePlugState>cm.plugged;
                             this.plugStateSub.next(this.chargingState.plugged);
 
                             this.chargingStateSub.next(this.chargingState);
-
-                        // } else if (cm.state) {
-                        //     this.chargingState = cm.state;
-                            // this.chargingStateSub.next(this.chargingState);
-
-                        // } else {
-                        //     console.error('Unknown event state type:', data);
-                        // }
                     }
                 } else {
                     // console.error('Unknown event api name:', data);

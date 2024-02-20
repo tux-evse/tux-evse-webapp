@@ -1,4 +1,3 @@
-
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, delay, filter, map, switchMap, take } from 'rxjs';
 import { AFBWebSocketService, IAfbResponse } from './AFB-websocket.service';
@@ -8,7 +7,6 @@ import { AFBWebSocketService, IAfbResponse } from './AFB-websocket.service';
 export class DbusService {
 
     apiName = 'dbus';
-
 
     constructor(
         private afbService: AFBWebSocketService,
@@ -27,6 +25,4 @@ export class DbusService {
             }
         });
     }
-
-    
 }
