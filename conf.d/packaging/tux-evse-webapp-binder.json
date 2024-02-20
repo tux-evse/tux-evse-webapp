@@ -1,9 +1,0 @@
-{
-    "name": "tux-evse-webapp",
-    "monitoring": true,
-    "port": 1239,
-    "roothttp": "/usr/redpesk/tux-evse-webapp/htdocs",
-    "alias": [
-        "/monitoring:/usr/share/afb-binder/monitoring"
-    ]
-}
