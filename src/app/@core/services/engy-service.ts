@@ -53,6 +53,7 @@ export class EngyService {
                 ]);
             })
         ).subscribe((res: IAfbResponse[]) => {
+            console.log('SLY engy :', res);
             if (res.length !== 3) {
                 console.error('ERROR while subscribing to event for ', this.apiName, res);
                 return;
