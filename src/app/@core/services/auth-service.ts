@@ -8,7 +8,6 @@ export class AuthService {
 
     apiName = 'auth';
 
-
     constructor(
         private afbService: AFBWebSocketService,    
     ) {

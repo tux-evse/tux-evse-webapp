@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, delay, map, takeUntil } from 'rxjs';
 import { AFBWebSocketService, SocketStatus } from '../@core/services/AFB-websocket.service';
+import { DbusService } from '../@core/services/dbus-service';
 
 @Component({
   selector: 'app-header',
@@ -10,6 +11,7 @@ import { AFBWebSocketService, SocketStatus } from '../@core/services/AFB-websock
 export class HeaderComponent implements OnInit, OnDestroy {
   title = 'valeo';
   wsStatus$: Observable<SocketStatus>;
+  dbusState$: Observable<string>;
 
   onDestroy: Subject<boolean> = new Subject();
 
@@ -20,10 +22,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   constructor(
     private afbService: AFBWebSocketService,
-  ){
+    private dbusService: DbusService,
+  ) {
     afbService.Init('api', 'HELLO');
     // if (environment.production) {
-        this.afbService.SetURL(window.location.host);
+    this.afbService.SetURL(window.location.host);
     // } else {
     //     afbService.SetURL('localhost', '1235');
     // }
@@ -38,17 +41,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
    * Connects to the afbService.
    */
   ngOnInit() {
-   this.afbService.Status$.pipe(
+    this.dbusState$ = this.dbusService.getDbusData$().pipe(
+      map(res => {
+      console.log('SLY dbusState$ : ', res);
+      return res;
+    }));
+
+    this.afbService.Status$.pipe(
       takeUntil(this.onDestroy)
     ).subscribe(status => {
       if (status.connected) {
         this.wifiStatus = 'on';
-        this.nfcStatus = 'on';
+        // this.nfcStatus = 'on';
         this.ethernetStatus = 'on';
         this.mobileStatus = 'on';
       } else {
         this.wifiStatus = 'off';
-        this.nfcStatus = 'off';
+        // this.nfcStatus = 'off';
         this.ethernetStatus = 'off';
         this.mobileStatus = 'off';
       }
