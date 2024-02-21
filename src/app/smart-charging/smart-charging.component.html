@@ -7,7 +7,7 @@
                     <td>{{ smart.name }}</td>
                     <td>
                         <label class="switch">
-                            <input type="checkbox" disabled [checked]="smart.checked">
+                            <input type="checkbox" disabled [checked]="smart.checked || (smart.name === 'IEC' && smartStatus === 'iec')">
                             <span class="slider round"></span>
                         </label>
                     </td>

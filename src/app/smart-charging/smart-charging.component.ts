@@ -42,11 +42,19 @@ export class SmartChargingComponent {
     this.chMgrService.getIsoState$().subscribe(state => console.log('SLY in smart state component: state=', state));
   }
 
-  changeSmartList(smart: string) {
-    this.smartList.forEach(s => {
-      if (s.name === smart) {
-        s.checked = !s.checked;
-      }
-    });
-  }
+  // changeSmartList(smart: string) {
+  //   // this.smartList.forEach(s => {
+  //   //   if (s.name === smart) {
+  //   //     s.checked = !s.checked;
+  //   //   }
+  //   // });
+  //   if (this.smartStatus === eIsoState.Iec) {
+  //     this.smartList.forEach(s => {
+  //       if (s.name === smart) {
+  //         s.checked = !s.checked;
+  //       }
+  //     });
+      
+  //   }
+  // }
 }
