@@ -10,7 +10,7 @@
                                         <path
                                                 d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41z" />
                                 </svg>
-                                <b> Tension Delivered :</b> {{engyData[enumMeterTagSet.Tension].total}} V
+                                <b> Voltage :</b> {{(engyData[enumMeterTagSet.Tension].total / 100)}} V
                         </p>
                 </div>
                 <div class="col-12">
@@ -21,7 +21,7 @@
                                         <path
                                                 d="M2 4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm10 1a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm4 3a1.5 1.5 0 0 1-1.5 1.5v-3A1.5 1.5 0 0 1 16 8" />
                                 </svg>
-                                <b> Charging power :</b> {{engyData[enumMeterTagSet.Power].total}} W/h
+                                <b> Charging power :</b> {{(engyData[enumMeterTagSet.Power].l1 / 100)}} W
                         </p>
                 </div>
                 <div class="col-12">
@@ -32,7 +32,7 @@
                                         <path
                                                 d="M2 4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm10 1a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm4 3a1.5 1.5 0 0 1-1.5 1.5v-3A1.5 1.5 0 0 1 16 8" />
                                 </svg>
-                                <b> Charging current :</b> {{engyData[enumMeterTagSet.Current].total}} A
+                                <b> Charging current :</b> {{(engyData[enumMeterTagSet.Current].total / 100)}} A
                         </p>
                 </div>
         </ng-container>
