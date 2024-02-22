@@ -44,7 +44,6 @@ export class EngyService {
         // Now subscribe to event
         this.afbService.InitDone$.pipe(
             filter(done => done),
-            // delay(1000),     // TODO: understand if we really need it ?
             switchMap(() => {
                 return combineLatest([
                     this.afbService.Send(this.apiName + '/tension', { 'action': 'subscribe' }),
@@ -75,12 +74,32 @@ export class EngyService {
             this.afbService.OnEvent('engy/tension').subscribe(data => {
                 if (data && data.data) {
                     this.meterData[eMeterTagSet.Tension] = data.data;
-                    // console.log('SLY', data.data);
+                    // console.log('SLY tension: ', data.data);
                     this.engyDataSub.next(this.meterData);
                 } else {
                     console.error('invalid tension data:', data);
                 }
             });
+
+            this.afbService.OnEvent('engy/energy').subscribe(data => {
+                if (data && data.data) {
+                    this.meterData[eMeterTagSet.Energy] = data.data;
+                    // console.log('SLY energy:', data.data);
+                    this.engyDataSub.next(this.meterData);
+                } else {
+                    console.error('invalid energy data:', data);
+                }
+            })
+
+            this.afbService.OnEvent('engy/current').subscribe(data => {
+                if (data && data.data) {
+                    this.meterData[eMeterTagSet.Current] = data.data;
+                    // console.log('SLY current: ', data.data);
+                    this.engyDataSub.next(this.meterData);
+                } else {
+                    console.error('invalid current data:', data);
+                }
+            })
 
 
             this.getAllEngyData$().subscribe(data => {
@@ -93,54 +112,4 @@ export class EngyService {
         return this.engyDataSub.asObservable();
     }
 
-    getTensionData$(): Observable<IMeterData> {
-        return this.engyDataSub.asObservable().pipe(
-            // filter(data => eMeterTagSet.Tension in data),
-            map(data => {
-                const x = this.adjustMeter(data[eMeterTagSet.Tension]);
-                // console.log('SLY getCurrentData$ map tension', x);
-                return x;
-            }),
-            distinctUntilKeyChanged('total'),
-        );
-    }
-
-    getEnergyData$(): Observable<IMeterData> {
-        return this.engyDataSub.asObservable().pipe(
-            // filter(data => eMeterTagSet.Energy in data),
-            map(data => this.adjustMeter(data[eMeterTagSet.Energy])),
-            distinctUntilKeyChanged('total'),
-        );
-    }
-
-    getCurrentData$(): Observable<IMeterData> {
-        return this.engyDataSub.asObservable().pipe(
-            // filter(data => eMeterTagSet.Current in data),
-            map(data => {
-                const x = this.adjustMeter(data[eMeterTagSet.Current]);
-                // console.log('SLY getCurrentData$ map current', data);
-                return x;
-            }),
-            distinctUntilKeyChanged('total'),
-        );
-    }
-
-    private adjustMeter(d: IMeterData): IMeterData {
-        d.total /= 100.0;
-        d.l1 /= 100.0;
-        d.l2 /= 100.0;
-        d.l3 /= 100.0;
-        console.log('SYLVAIIIIIIIIIIIN', d);
-        return d;
-    }
-    // private adjustMeter(d: IMeterData): IMeterData {
-    //     console.log('SYLVAIIIIIIIIIIIN', d);
-    //     const factor = 100.0;
-    //     return {
-    //         total: d.total / factor,
-    //         l1: d.l1 / factor,
-    //         l2: d.l2 / factor,
-    //         l3: d.l3 / factor,
-    //     };
-    // }
 }
