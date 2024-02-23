@@ -49,10 +49,10 @@ export class EngyService {
                     this.afbService.Send(this.apiName + '/tension', { 'action': 'subscribe' }),
                     this.afbService.Send(this.apiName + '/energy', { 'action': 'subscribe' }),
                     this.afbService.Send(this.apiName + '/current', { 'action': 'subscribe' }),
+                    this.afbService.Send(this.apiName + '/power', { 'action': 'subscribe' }),
                 ]);
             })
         ).subscribe((res: IAfbResponse[]) => {
-            console.log('SLY engy :', res);
             if (res.length !== 3) {
                 console.error('ERROR while subscribing to event for ', this.apiName, res);
                 return;
@@ -61,14 +61,7 @@ export class EngyService {
                 if (r.request.status !== 'success') {
                     console.error('ERROR while subscribing, api', this.apiName, ' res=', r);
                 }
-
             }
-
-            // this.getAllEngyData$().subscribe(
-            //     data => {
-            //     console.log('SLY getAllEngyData$', data);
-            // }
-            // )
 
             //  Update data on event in WS
             this.afbService.OnEvent('engy/tension').subscribe(data => {
@@ -79,7 +72,7 @@ export class EngyService {
                 } else {
                     console.error('invalid tension data:', data);
                 }
-            });
+            })
 
             this.afbService.OnEvent('engy/energy').subscribe(data => {
                 if (data && data.data) {
@@ -101,15 +94,20 @@ export class EngyService {
                 }
             })
 
-
-            this.getAllEngyData$().subscribe(data => {
-                // console.log('SLY getAllEngyData$', data);
+            this.afbService.OnEvent('engy/power').subscribe(data => {
+                if (data && data.data) {
+                    this.meterData[eMeterTagSet.Power] = data.data;
+                    // console.log('SLY power: ', data.data);
+                    this.engyDataSub.next(this.meterData);
+                } else {
+                    console.error('invalid power data:', data);
+                }
             })
+
         });
     }
 
     getAllEngyData$(): Observable<MapMeterData> {
         return this.engyDataSub.asObservable();
     }
-
 }

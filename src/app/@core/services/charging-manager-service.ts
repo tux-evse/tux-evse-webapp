@@ -2,14 +2,6 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest, delay, filter, map, switchMap, take } from 'rxjs';
 import { AFBWebSocketService, IAfbResponse } from './AFB-websocket.service';
 
-// export enum eReservationState {
-//     Accepted = 'accepted',
-//     Refused = 'refused',
-//     Pending = 'pending',
-//     Cancel = 'cancel',
-//     Request = 'request',
-// }
-
 export enum ePlugState {
     PlugIn = 'plugin',
     Lock = 'lock',
@@ -50,7 +42,6 @@ export interface IChargingState {
     power: ePowerRequest;
     iso: eIsoState;
     auth: eAuthMsg;
-    // reservation?: eReservationState;
 }
 
 export interface IChargingMsg {
@@ -75,7 +66,6 @@ export class ChMgrService {
         power: ePowerRequest.Unknown,
         iso: eIsoState.Unset,
         auth: eAuthMsg.Unknown,
-        // reservation: eReservationState.Pending
     };
     private chargingStateSub = new BehaviorSubject(this.chargingState);
     private plugStateSub = new BehaviorSubject(this.chargingState.plugged);
@@ -91,7 +81,6 @@ export class ChMgrService {
         // Now subscribe to event
         this.afbService.InitDone$.pipe(
             filter(done => done),
-            // delay(1000),     // TODO: understand if we really need it ?
             switchMap(() => {
                 return combineLatest([
                     this.afbService.Send(this.apiName + '/state', { 'action': 'subscribe' }),
@@ -118,10 +107,8 @@ export class ChMgrService {
                 if (data.event === this.apiName + '/state') {
                     if (data && data.data) {
                         const cm = <IChargingMsg>data.data;
-                        // console.log('SLY chmgrservice = ', data);
 
                             this.chargingState = <IChargingState>{auth: cm.auth,iso: cm.iso,plugged: cm.plugged,power: cm.power};
-
 
                             this.powerStateSub.next(this.chargingState.power);
 

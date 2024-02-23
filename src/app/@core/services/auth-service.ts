@@ -15,7 +15,6 @@ export class AuthService {
         // Now subscribe to event
         this.afbService.InitDone$.pipe(
             filter(done => done),
-            // delay(1000),
             switchMap(() => {
                 return this.afbService.Send(this.apiName + '/subscribe', 'true');
             })
