@@ -7,7 +7,7 @@ import { ChMgrService, ePlugState } from '../@core/services/charging-manager-ser
     styleUrls: ['./status-plug.component.scss']
 })
 export class StatusPlugComponent implements OnInit {
-    plugStatus: ePlugState = ePlugState.Unknown; // Change this variable to select the case
+    plugStatus: ePlugState = ePlugState.Unknown;
 
     plugText = new Map<ePlugState, string>([
         [ePlugState.PlugOut, "<span class='intermediate'>Disconnected</span>"],
@@ -32,8 +32,5 @@ export class StatusPlugComponent implements OnInit {
 
     ngOnInit() {
         this.ChMgrService.getPlugState$().subscribe(s => this.plugStatus = s);
-
-        // this.ChMgrService.getPlugState$().subscribe(s => console.log('SLY in plug state component: state=', s));
     }
-
 }

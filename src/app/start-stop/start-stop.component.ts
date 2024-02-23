@@ -21,6 +21,5 @@ export class StartStopComponent implements OnInit {
 
   ngOnInit(): void {
     this.ChMgrService.getPowerState$().subscribe(s => this.chargeStatus = s);
-    // this.ChMgrService.getPowerState$().subscribe(s => console.log('SLY in start-stop =', s));
   }
 }

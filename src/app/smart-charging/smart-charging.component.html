@@ -1,18 +1,16 @@
 <div class="row" style="border: 2px dashed;">
     <div class="col">
-        <div class="table-responsive">
+        <div>
             <p style="font-size: 20px;font-weight: 800;text-align: center;">test & debug indicators</p>
-            <table>
-                <tr *ngFor="let smart of smartList">
-                    <td>{{ smart.name }}</td>
-                    <td>
-                        <label class="switch">
-                            <input type="checkbox" disabled [checked]="smart.checked || (smart.name === 'IEC' && smartStatus === 'iec')">
-                            <span class="slider round"></span>
-                        </label>
-                    </td>
-                </tr>
-            </table>
+            <div class="row">
+                <div *ngFor="let smart of smartList" class="col-6 mb-1" style="padding-right: 15%;">{{ smart.name }}
+                    <label class="switch" style="vertical-align: middle;float: right;">
+                        <input type="checkbox" disabled
+                            [checked]="smart.checked || (smart.name === smartStatus)">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
         </div>
     </div>
 </div>

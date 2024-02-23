@@ -43,7 +43,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.dbusState$ = this.dbusService.getDbusData$().pipe(
       map(res => {
-      console.log('SLY dbusState$ : ', res);
       return res;
     }));
 
