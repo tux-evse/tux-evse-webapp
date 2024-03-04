@@ -31,5 +31,6 @@ export class BorneInformationComponent implements OnInit {
 
   ngOnInit(): void {
     this.ChMgrService.getPowerState$().subscribe(s => this.stationStatus = s);
+    console.log(this.stationText.get(this.stationStatus));
   }
 }
