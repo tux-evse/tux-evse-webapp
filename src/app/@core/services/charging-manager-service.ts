@@ -83,20 +83,21 @@ export class ChMgrService {
             filter(done => done),
             switchMap(() => {
                 return combineLatest([
-                    this.afbService.Send(this.apiName + '/state', { 'action': 'subscribe' }),
+                    // this.afbService.Send(this.apiName + '/state', { 'action': 'subscribe' }),
+
                     this.afbService.Send(this.apiName + '/subscribe', true),
                 ]);
             })
         ).subscribe((res: IAfbResponse[]) => {
-            if (res.length !== 2) {
+            if (res.length !== 1) {
                 console.error('ERROR while subscribing to event for ', this.apiName, res);
                 return;
             }
+            // if (res[0].request.status !== 'success') {
+            //     console.error('ERROR while subscribing to charging-state (/state) to event ', res[0]);
+            // }
             if (res[0].request.status !== 'success') {
-                console.error('ERROR while subscribing to charging-state (/state) to event ', res[0]);
-            }
-            if (res[1].request.status !== 'success') {
-                console.error('ERROR while subscribing to subscribe-msg (/subscribe) to event ', res[1]);
+                console.error('ERROR while subscribing to subscribe-msg (/subscribe) to event ', res[0]);
             }
 
             // TODO - populate initial state
@@ -104,24 +105,61 @@ export class ChMgrService {
 
             //  Update data on event in WS
             this.afbService.OnEvent('*').subscribe(data => {
-                if (data.event === this.apiName + '/state') {
+                if (data.event === this.apiName + '/msg') {
+                    console.log('Charging state updated', data);
                     if (data && data.data) {
-                        const cm = <IChargingMsg>data.data;
-
-                            this.chargingState = <IChargingState>{auth: cm.auth,iso: cm.iso,plugged: cm.plugged,power: cm.power};
-
-                            this.powerStateSub.next(this.chargingState.power);
-
-                            this.authStateSub.next(this.chargingState.auth);
-
-                            this.isoStateSub.next(this.chargingState.iso);
-
+                        if (data.data?.plugged) {
+                            console.log('Charging state plugged', data.data?.plugged);
+                            this.chargingState.plugged = data.data?.plugged;
                             this.plugStateSub.next(this.chargingState.plugged);
+                        }
+                        if (data.data?.power) {
+                            console.log('Charging state power', data.data?.power);
+                            if (typeof data.data.power === 'string') {
+                                if (data.data.power === 'idle') {
+                                    this.chargingState.power = ePowerRequest.Idle;
+                                } else if (data.data.power === 'charging') {
+                                    this.chargingState.power = ePowerRequest.Charging;
+                                } else if (data.data.power === 'start') {
+                                    this.chargingState.power = ePowerRequest.Start;
+                                }
+                            } else if (typeof data.data.power === 'object') {
+                                if ('stop' in data.data.power) {
+                                    this.chargingState.power = ePowerRequest.Stop;
+                                } else if ('charging' in data.data.power) {
+                                    this.chargingState.power = ePowerRequest.Charging;
+                                }
+                            }
+                            
+                           
+                            this.powerStateSub.next(this.chargingState.power);
+                        }
+                        if (data.data?.iso) {
+                            console.log('Charging state iso', data.data?.iso);
+                            this.chargingState.iso = data.data?.iso;
+                            this.isoStateSub.next(this.chargingState.iso);
+                        }
+                        if (data.data?.auth) {
+                            console.log('Charging state auth', data.data?.auth);
+                            this.chargingState.auth = data.data?.auth;
+                            this.authStateSub.next(this.chargingState.auth);
+                        }
+                        // const cm = <IChargingMsg>data.data;
 
-                            this.chargingStateSub.next(this.chargingState);
+                            // this.chargingState = <IChargingState>{auth: cm.auth,iso: cm.iso,plugged: cm.plugged,power: cm.power};
+
+                            // this.powerStateSub.next(this.chargingState.power);
+
+                            // this.authStateSub.next(this.chargingState.auth);
+
+                            // this.isoStateSub.next(this.chargingState.iso);
+
+                            // this.plugStateSub.next(this.chargingState.plugged);
+
+                            // this.chargingStateSub.next(this.chargingState);
                     }
                 } else {
-                    // console.error('Unknown event api name:', data);
+                    // console.error('Update data on event in WS : Unknown event api name:', data);
                 }
             });
         });
