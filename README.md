@@ -44,7 +44,9 @@ dnf install afb-ui-devtools
 npm install
 npm run build
 ```
+
 To build webapp in production mode use:
+
 ```bash
 ./package-webapp.sh
 ```

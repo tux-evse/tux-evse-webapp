@@ -34,6 +34,11 @@ export enum eAuthMsg {
     Unknown = 'unknown',
 }
 
+
+export interface IChargingPower {
+ charging: Number;
+}
+//power: ePowerRequest | IChargingPower;
 export interface IChargingState {
     updated?: boolean;
     imax?: Number;
@@ -101,7 +106,43 @@ export class ChMgrService {
             }
 
             // TODO - populate initial state
+            this.getChargingState().subscribe(res => {                
+                if (res?.plugged) {
+                    console.log('Charging state plugged', res?.plugged);
+                    this.chargingState.plugged = res?.plugged;
+                    this.plugStateSub.next(this.chargingState.plugged);
+                }
+                if (res?.iso) {
+                    console.log('Charging state iso', res?.iso);
+                    this.chargingState.iso = res?.iso;
+                    this.isoStateSub.next(this.chargingState.iso);
+                }
+                if (res?.auth) {
+                    console.log('Charging state auth', res?.auth);
+                    this.chargingState.auth = res?.auth;
+                    this.authStateSub.next(this.chargingState.auth);
+                }
 
+                if (res?.power) {
+                    console.log('Charging state power', res?.power);
+                    if (typeof res.power === 'string') {
+                        if (res.power === 'idle') {
+                            this.chargingState.power = ePowerRequest.Idle;
+                        } else if (res.power === 'charging') {
+                            this.chargingState.power = ePowerRequest.Charging;
+                        } else if (res.power === 'start') {
+                            this.chargingState.power = ePowerRequest.Start;
+                        }
+                    } else if (typeof res.power === 'object') {
+                        if ('stop' in res.power) {
+                            this.chargingState.power = ePowerRequest.Stop;
+                        } else if ('charging' in res.power) {
+                            this.chargingState.power = ePowerRequest.Charging;
+                        }
+                    }
+                    this.powerStateSub.next(this.chargingState.power);
+                }
+            });
 
             //  Update data on event in WS
             this.afbService.OnEvent('*').subscribe(data => {
@@ -130,8 +171,6 @@ export class ChMgrService {
                                     this.chargingState.power = ePowerRequest.Charging;
                                 }
                             }
-                            
-                           
                             this.powerStateSub.next(this.chargingState.power);
                         }
                         if (data.data?.iso) {
